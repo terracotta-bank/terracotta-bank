@@ -1,0 +1,77 @@
+buildscript {
+	ext {
+		springBootVersion = '2.0.1.RELEASE'
+	}
+	repositories {
+		mavenCentral()
+        jcenter()
+        maven {
+		url "https://plugins.gradle.org/m2/"
+        }
+	}
+	dependencies {
+		classpath("org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}")
+		classpath("me.champeau.gradle:jmh-gradle-plugin:0.4.7")
+	}
+}
+
+apply plugin: 'java'
+apply plugin: 'eclipse'
+apply plugin: 'idea'
+apply plugin: 'org.springframework.boot'
+apply plugin: 'io.spring.dependency-management'
+apply plugin: 'war'
+
+apply plugin: 'me.champeau.gradle.jmh'
+
+group = 'com.joshcummings'
+version = '0.0.1-SNAPSHOT'
+sourceCompatibility = 1.8
+
+repositories {
+	mavenCentral()
+    mavenLocal()
+}
+
+jmh {
+	includeTests = true
+	duplicateClassesStrategy = 'warn'
+}
+
+dependencies {
+	compile('org.springframework.boot:spring-boot-starter-data-jpa')
+	//compile('org.springframework.boot:spring-boot-starter-security')
+	compile('org.springframework.boot:spring-boot-starter-web')
+
+	compile('com.h2database:h2')
+	compile('javax.mail:mail:1.4')
+	compile('javax.servlet:jstl')
+	compile('org.apache.tomcat.embed:tomcat-embed-jasper')
+
+	compile('javax.xml.bind:jaxb-api')
+	compile('com.sun.xml.bind:jaxb-core:2.3.0.1')
+	compile('com.sun.xml.bind:jaxb-impl:2.3.0.1')
+	
+	testCompile('org.springframework:spring-beans')
+	testCompile('org.springframework:spring-context')
+	testCompile('org.springframework:spring-core')
+	testCompile('org.springframework.boot:spring-boot-starter-test')
+	testCompile('org.springframework.security:spring-security-test')
+
+	testCompile('com.github.docker-java:docker-java:3.0.14')
+	testCompile('com.github.mike10004:littleproxy:1.1.3socksmod1')
+	testCompile('io.github.bonigarcia:webdrivermanager:2.2.1')
+ 	testCompile('org.mockito:mockito-core')
+	testCompile('org.seleniumhq.selenium:selenium-java')
+	testCompile('org.testng:testng:6.14.3')
+
+	jmh('org.openjdk.jmh:jmh-core:1.21')
+	jmh('org.openjdk.jmh:jmh-generator-annprocess:1.21')
+	jmh('org.apache.httpcomponents:httpclient:4.5')
+}
+
+idea {
+	module {
+		testSourceDirs += project.sourceSets.jmh.java.srcDirs
+	}
+}

@@ -1,0 +1,15 @@
+<!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd" >
+
+<suite name="filesystem" verbose="1">
+	<test name="docker">
+		<groups>
+			<run>
+				<include name="filesystem" />
+			</run>
+		</groups>
+		
+		<packages>
+      		<package name=".*" />
+  		</packages>
+	</test>
+</suite>

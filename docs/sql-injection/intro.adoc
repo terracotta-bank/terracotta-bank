@@ -1,0 +1,13 @@
+Terracotta has a number of places where it is vulnerable to SQL Injection.
+Having multiple vulnerable endpoints gives you an opportunity to practice penetration and mitigation multiple times.
+
+To discover vulnerable endpoints, try using http://sqlmap.org/[sqlmap].
+Or simply try using common SQL injection techniques against all the forms in the application.
+
+If you get stuck, check out the unit tests in Terracotta for ideas.
+
+Or, also try reviewing the `sql-injection` mitigation track by doing:
+
+```bash
+./checkout-lesson.sh sql-injection
+```

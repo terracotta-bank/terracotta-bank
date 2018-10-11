@@ -68,12 +68,12 @@ public class LoginServlet extends HttpServlet {
 
 		if ( user == null )
 		{
-			String error = "The username you provided is incorrect.";
+			String error = "The username or password you provided is incorrect.";
 			this.error(request, response, error);
 		}
 		else if ( !BCrypt.checkpw(password, user.getPassword()) )
 		{
-			String error = "The password you provided is incorrect.";
+			String error = "The username or password you provided is incorrect.";
 			this.error(request, response, error);
 		}
 		else

@@ -87,14 +87,17 @@ public class RegisterServlet extends HttpServlet {
 			this.userService.addUser(user);
 			this.accountService.addAccount(account);
 
-			request.getSession().setAttribute("authenticatedUser", user);
-			request.getSession().setAttribute("authenticatedAccount", account);
-			response.sendRedirect(request.getContextPath() + "/index.jsp");
+			request.setAttribute("registrationErrorMessage",
+					"You should receive instructions by email soon.");
+			request.getRequestDispatcher(request.getContextPath() + "index.jsp")
+					.forward(request, response);
 		}
 		catch ( IllegalArgumentException e )
 		{
-			request.setAttribute("registrationErrorMessage", "That username is already taken");
-			request.getRequestDispatcher(request.getContextPath() + "index.jsp").forward(request, response);
+			request.setAttribute("registrationErrorMessage",
+					"You should receive instructions by email soon.");
+			request.getRequestDispatcher(request.getContextPath() + "index.jsp")
+					.forward(request, response);
 		}
 	}
 

@@ -27,11 +27,11 @@ import java.util.function.Function;
 public abstract class ServiceSupport {
 	private static final String DATABASE_URL = "jdbc:h2:mem:db";
 	
-	public <T> Set<T> runQuery(String query, Function<ResultSet, T> inflater) {
+	public <T> Set<T> runQuery(String query, Inflater<T> inflater) {
 		return runQuery(query, ps -> ps, inflater);
 	}
 	
-	public <T> Set<T> runQuery(String query, Preparer preparer, Function<ResultSet, T> inflater) {
+	public <T> Set<T> runQuery(String query, Preparer preparer, Inflater<T> inflater) {
 		Set<T> results = new HashSet<T>();
 		try ( Connection conn = DriverManager.getConnection(DATABASE_URL, "user", "password");
 				PreparedStatement ps = conn.prepareStatement(query);
@@ -72,5 +72,10 @@ public abstract class ServiceSupport {
 	@FunctionalInterface
 	public interface Preparer {
 		PreparedStatement prepare(PreparedStatement ps) throws SQLException;
+	}
+
+	@FunctionalInterface
+	public interface Inflater<T> {
+		T apply(ResultSet resultSet) throws SQLException;
 	}
 }

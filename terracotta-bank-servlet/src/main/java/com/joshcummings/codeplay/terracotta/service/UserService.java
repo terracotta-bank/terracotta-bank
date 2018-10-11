@@ -44,9 +44,14 @@ public class UserService extends ServiceSupport {
 	}
 
 	public User findByUsernameAndPassword(String username, String password) {
-		Set<User> users = runQuery("SELECT * FROM users WHERE username = '" + username + "' AND password = '" + password + "'", (rs) ->
-			new User(rs.getString(1), rs.getString(4), rs.getString(5),
-				rs.getString(2), rs.getString(3)));
+		Set<User> users = runQuery("SELECT * FROM users WHERE username = ? AND password = ?",
+			(ps) -> {
+				ps.setString(1, username);
+				ps.setString(2, password);
+				return ps;
+			}, (rs) ->
+				new User(rs.getString(1), rs.getString(4), rs.getString(5),
+					rs.getString(2), rs.getString(3)));
 		return users.isEmpty() ? null : users.iterator().next();
 	}
 

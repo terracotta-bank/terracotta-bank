@@ -64,20 +64,16 @@ public class LoginServlet extends HttpServlet {
 		String username = request.getParameter("username");
 		String password = request.getParameter("password");
 
-		User user = this.userService.findByUsername(username);
+		boolean matches = this.userService.findByUsernameAndPassword(username, password);
 
-		if ( user == null )
-		{
-			String error = "The username or password you provided is incorrect.";
-			this.error(request, response, error);
-		}
-		else if ( !BCrypt.checkpw(password, user.getPassword()) )
+		if ( !matches )
 		{
 			String error = "The username or password you provided is incorrect.";
 			this.error(request, response, error);
 		}
 		else
 		{
+			User user = this.userService.findByUsername(username);
 			Set<Account> accounts = this.accountService.findByUsername(user.getUsername());
 
 			request.getSession().setAttribute("authenticatedUser", user);

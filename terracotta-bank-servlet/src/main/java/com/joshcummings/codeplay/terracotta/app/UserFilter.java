@@ -67,8 +67,9 @@ public class UserFilter implements Filter {
 						String basic =  authorization.substring(6);
 						String[] up = new String(Base64.getDecoder().decode(basic)).split(":");
 
-						user = this.userService.findByUsernameAndPassword(up[0], up[1]);
-						if ( user == null ) {
+						if ( this.userService.findByUsernameAndPassword(up[0], up[1]) ) {
+							user = this.userService.findByUsername(up[0]);
+						} else {
 							((HttpServletResponse) resp).setStatus(403);
 						}
 					}

@@ -48,14 +48,20 @@ public class EmployeeLoginServlet extends HttpServlet {
 		String username = request.getParameter("username");
 		String password = request.getParameter("password");
 
-		User user = this.userService.findByUsernameAndPassword(username, password);
-		request.getSession().setAttribute("authenticatedUser", user);
-		
-		String relay = request.getParameter("relay");
-		if ( relay == null || relay.isEmpty() ) {
-			response.sendRedirect(request.getContextPath() + "/employee.jsp");
+		boolean matches = this.userService.findByUsernameAndPassword(username, password);
+
+		if ( !matches ) {
+			response.setStatus(400);
 		} else {
-			response.sendRedirect(relay);
+			User user = this.userService.findByUsername(username);
+			request.getSession().setAttribute("authenticatedUser", user);
+
+			String relay = request.getParameter("relay");
+			if (relay == null || relay.isEmpty()) {
+				response.sendRedirect(request.getContextPath() + "/employee.jsp");
+			} else {
+				response.sendRedirect(relay);
+			}
 		}
 	}
 

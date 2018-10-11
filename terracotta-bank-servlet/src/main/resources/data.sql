@@ -1,3 +1,8 @@
+-- H2-specific feature. When using H2, use this property to force all queries to
+-- use bind variables. Note that this will break Terracotta unless you also change
+-- all the queries to use prepared statements.
+-- SET ALLOW_LITERALS NONE;
+
 DROP TABLE IF EXISTS users;
 DROP TABLE IF EXISTS accounts;
 DROP TABLE IF EXISTS checks;

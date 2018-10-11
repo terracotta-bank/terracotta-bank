@@ -45,6 +45,22 @@ public abstract class ServiceSupport {
 		return results;
 	}
 
+	public <T> T getSingleResult(String query, Preparer preparer, Inflater<T> inflater) {
+		try ( Connection conn = DriverManager.getConnection(DATABASE_URL, "user", "password");
+			  PreparedStatement ps = conn.prepareStatement(query);
+			  ResultSet rs = preparer.prepare(ps).executeQuery(); ) {
+			if ( rs.next() ) {
+				return inflater.apply(rs);
+			}
+			if ( rs.next() ) {
+				throw new IllegalStateException("Expected only one result, but received more than one");
+			}
+		} catch ( SQLException e ) {
+			throw new IllegalArgumentException(e);
+		}
+		return null;
+	}
+
 	public Integer count(String tableName) {
 		return runQuery("SELECT count(*) FROM " + tableName,
 				(rs) -> {

@@ -15,6 +15,7 @@
  */
 package com.joshcummings.codeplay.terracotta.model;
 
+import javax.persistence.*;
 import java.io.Serializable;
 
 /**
@@ -23,15 +24,22 @@ import java.io.Serializable;
  *
  * @author Josh Cummings
  */
+@Entity
+@Table(name="users")
 public class User implements Serializable {
 	private static final long serialVersionUID = 1L;
-	
-	private final String id;
-	private final String username;
-	private final String password;
-	private final String name;
-	private final String email;
-	
+
+	@Id
+	@GeneratedValue(strategy = GenerationType.AUTO)
+	private String id;
+	private String username;
+	private String password;
+	private String name;
+	private String email;
+
+	// for Hibernate
+	User() {}
+
 	public User(String id, String username, String password, String name, String email) {
 		this.id = id;
 		this.username = username;

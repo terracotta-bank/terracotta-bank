@@ -16,6 +16,8 @@
 package com.joshcummings.codeplay.terracotta.service;
 
 import com.joshcummings.codeplay.terracotta.model.User;
+import com.joshcummings.codeplay.terracotta.repository.UserRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.Set;
@@ -29,6 +31,9 @@ import java.util.Set;
  */
 @Service
 public class UserService extends ServiceSupport {
+	@Autowired
+	UserRepository userRepository;
+
 	public void addUser(User user) {
 		runUpdate("INSERT INTO users (id, username, password, name, email)"
 				+ " VALUES ('" + user.getId() + "','" + user.getUsername() + 
@@ -43,19 +48,7 @@ public class UserService extends ServiceSupport {
 	}
 
 	public User findByUsernameAndPassword(String username, String password) {
-		return getSingleResult("SELECT id, username, password, name, email " +
-				"FROM users " +
-				"WHERE username = ?" +
-				"AND password = ?",
-			(ps) -> {
-				ps.setString(1, username);
-				ps.setString(2, password);
-				return ps;
-				},
-			(rs) ->
-				new User(rs.getString("id"), rs.getString("username"),
-						rs.getString("password"), rs.getString("name"),
-						rs.getString("email")));
+		return this.userRepository.findUserByUsernameAndPassword(username, password);
 	}
 
 	public Integer count() {

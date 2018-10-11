@@ -86,6 +86,7 @@ dependencies {
 	compile('javax.mail:mail:1.4')
 	compile('javax.servlet:jstl')
 	compile('org.apache.tomcat.embed:tomcat-embed-jasper')
+	compile('org.mindrot:jbcrypt:0.4')
 
 	compile('javax.xml.bind:jaxb-api')
 	compile('com.sun.xml.bind:jaxb-core:2.3.0.1')

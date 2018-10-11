@@ -19,6 +19,7 @@ import com.joshcummings.codeplay.terracotta.model.Account;
 import com.joshcummings.codeplay.terracotta.model.User;
 import com.joshcummings.codeplay.terracotta.service.AccountService;
 import com.joshcummings.codeplay.terracotta.service.UserService;
+import org.mindrot.jbcrypt.BCrypt;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -63,11 +64,16 @@ public class LoginServlet extends HttpServlet {
 		String username = request.getParameter("username");
 		String password = request.getParameter("password");
 
-		User user = this.userService.findByUsernameAndPassword(username, password);
+		User user = this.userService.findByUsername(username);
 
 		if ( user == null )
 		{
-			String error = "The username (" + username + ") or password you provided is incorrect.";
+			String error = "The username you provided is incorrect.";
+			this.error(request, response, error);
+		}
+		else if ( !BCrypt.checkpw(password, user.getPassword()) )
+		{
+			String error = "The password you provided is incorrect.";
 			this.error(request, response, error);
 		}
 		else

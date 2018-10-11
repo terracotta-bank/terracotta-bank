@@ -34,61 +34,36 @@ import java.util.Set;
 @Service
 public class AccountService extends ServiceSupport {
 	public Account findById(String id) {
-		Set<Account> accounts = runQuery("SELECT * FROM accounts WHERE id = " + id, (rs) -> {
-			try {
-				return new Account(rs.getString(1), new BigDecimal(rs.getString(2)), 
-						rs.getLong(3), rs.getString(4));
-			} catch ( SQLException e ) {
-				throw new IllegalStateException(e);
-			}
-		});
+		Set<Account> accounts = runQuery("SELECT * FROM accounts WHERE id = " + id, (rs) ->
+			new Account(rs.getString(1), new BigDecimal(rs.getString(2)),
+					rs.getLong(3), rs.getString(4)));
 		return accounts.size() > 0 ? accounts.iterator().next() : null;
 	}
 	
 	public Set<Account> findByUsername(String username) {
-		Set<Account> accounts = runQuery("SELECT accounts.* FROM accounts, users WHERE users.username = '" + username + "' AND accounts.owner_id = users.id", (rs) -> {
-			try {
-				return new Account(rs.getString(1), new BigDecimal(rs.getString(2)), 
-						rs.getLong(3), rs.getString(4));
-			} catch ( SQLException e ) {
-				throw new IllegalStateException(e);
-			}
-		});
+		Set<Account> accounts = runQuery("SELECT accounts.* FROM accounts, users WHERE users.username = '" + username + "' AND accounts.owner_id = users.id", (rs) ->
+			new Account(rs.getString(1), new BigDecimal(rs.getString(2)),
+					rs.getLong(3), rs.getString(4)));
 		return accounts;
 	}
 	
 	public Account findByAccountNumber(Integer accountNumber) {
-		Set<Account> accounts = runQuery("SELECT * FROM accounts WHERE number = " + accountNumber, (rs) -> {
-			try {
-				return new Account(rs.getString(1), new BigDecimal(rs.getString(2)), 
-						rs.getLong(3), rs.getString(4));
-			} catch ( SQLException e ) {
-				throw new IllegalStateException(e);
-			}
-		});
+		Set<Account> accounts = runQuery("SELECT * FROM accounts WHERE number = " + accountNumber, (rs) ->
+			new Account(rs.getString(1), new BigDecimal(rs.getString(2)),
+				rs.getLong(3), rs.getString(4)));
 		return accounts.size() > 0 ? accounts.iterator().next() : null;		
 	}
 	
 	public Set<Account> findAll() {
-		return runQuery("SELECT * FROM accounts", (rs) -> {
-			try {
-				return new Account(rs.getString(1), new BigDecimal(rs.getString(2)), 
-						rs.getLong(3), rs.getString(4));
-			} catch ( SQLException e ) {
-				throw new IllegalStateException(e);
-			}
-		});
+		return runQuery("SELECT * FROM accounts", (rs) ->
+			new Account(rs.getString(1), new BigDecimal(rs.getString(2)),
+				rs.getLong(3), rs.getString(4)));
 	}
 	
 	public Account findDefaultAccountForUser(User user) {
-		Set<Account> accounts = runQuery("SELECT * FROM accounts WHERE owner_id = '" + user.getId() + "'", (rs) -> {
-			try {
-				return new Account(rs.getString(1), new BigDecimal(rs.getString(2)), 
-						rs.getLong(3), rs.getString(4));
-			} catch ( SQLException e ) {
-				throw new IllegalStateException(e);
-			}
-		});
+		Set<Account> accounts = runQuery("SELECT * FROM accounts WHERE owner_id = '" + user.getId() + "'", (rs) ->
+			new Account(rs.getString(1), new BigDecimal(rs.getString(2)),
+				rs.getLong(3), rs.getString(4)));
 		
 		return accounts.size() > 0 ? accounts.iterator().next() : null;		
 	}

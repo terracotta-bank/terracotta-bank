@@ -1,0 +1,9 @@
+Even if you don't know any of the usernames in Terracotta, you can find them out with relative ease using Enumeration vulnerabilities.
+
+Enumeration vulnerabilies are where a request behaves differently to invalid inputs in such a way that data and state can be inferred. Like when you ask for your password to be restored and it tells you that there is no user associated with that username in the system..
+
+To get started, checkout the lesson:
+
+```bash
+./checkout-lesson.sh authentication-enumeration
+```

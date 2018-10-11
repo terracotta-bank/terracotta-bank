@@ -16,6 +16,10 @@
 package com.joshcummings.codeplay.terracotta.service;
 
 import com.joshcummings.codeplay.terracotta.model.User;
+import org.owasp.encoder.esapi.ESAPIEncoder;
+import org.owasp.esapi.ESAPI;
+import org.owasp.esapi.Encoder;
+import org.owasp.esapi.codecs.MySQLCodec;
 import org.springframework.stereotype.Service;
 
 import java.sql.SQLException;
@@ -43,13 +47,16 @@ public class UserService extends ServiceSupport {
 		return users.isEmpty() ? null : users.iterator().next();
 	}
 
+	private final MySQLCodec codec = new MySQLCodec(MySQLCodec.Mode.ANSI);
+	private final Encoder encoder = ESAPIEncoder.getInstance();
+
 	public User findByUsernameAndPassword(String username, String password) {
-		Set<User> users = runQuery("SELECT * FROM users WHERE username = ? AND password = ?",
-			(ps) -> {
-				ps.setString(1, username);
-				ps.setString(2, password);
-				return ps;
-			}, (rs) ->
+		String encodedUsername = this.encoder.encodeForSQL(this.codec, username);
+		String encodedPassword = this.encoder.encodeForSQL(this.codec, password);
+
+		Set<User> users = runQuery("SELECT * FROM users WHERE username = '" + encodedUsername + "'" +
+				" AND password = '" + encodedPassword + "'",
+			(rs) ->
 				new User(rs.getString(1), rs.getString(4), rs.getString(5),
 					rs.getString(2), rs.getString(3)));
 		return users.isEmpty() ? null : users.iterator().next();

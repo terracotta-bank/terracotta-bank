@@ -25,7 +25,7 @@ import java.util.Set;
 import java.util.function.Function;
 
 public abstract class ServiceSupport {
-	private static final String DATABASE_URL = "jdbc:h2:mem:db";
+	private static final String DATABASE_URL = "jdbc:hsqldb:mem:db";
 	
 	public <T> Set<T> runQuery(String query, Inflater<T> inflater) {
 		return runQuery(query, ps -> ps, inflater);

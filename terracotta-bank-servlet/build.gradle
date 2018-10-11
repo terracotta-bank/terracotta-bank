@@ -43,7 +43,7 @@ dependencies {
 	//compile('org.springframework.boot:spring-boot-starter-security')
 	compile('org.springframework.boot:spring-boot-starter-web')
 
-	compile('com.h2database:h2')
+	compile('org.hsqldb:hsqldb')
 	compile('javax.mail:mail:1.4')
 	compile('javax.servlet:jstl')
 	compile('org.apache.tomcat.embed:tomcat-embed-jasper')

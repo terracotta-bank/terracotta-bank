@@ -1,0 +1,9 @@
+It's also pretty easy to log in to Terracotta using brute force strategies. There is an account with a well-known user name, and there are four login endpoints total for you to try.
+
+Bruteforce vulnerabilities are manifest when the application does nothing to cap or slow-down a client's number of login attempts.
+
+To get started, checkout the lesson:
+
+```bash
+./checkout-lesson.sh authentication-bruteforce
+```

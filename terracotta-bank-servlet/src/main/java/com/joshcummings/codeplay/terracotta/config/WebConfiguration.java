@@ -18,6 +18,7 @@ package com.joshcummings.codeplay.terracotta.config;
 import com.joshcummings.codeplay.terracotta.app.RequestLogFilter;
 import com.joshcummings.codeplay.terracotta.app.UserFilter;
 import com.joshcummings.codeplay.terracotta.metrics.RequestClassificationFilter;
+import com.joshcummings.codeplay.terracotta.network.IpAddressResolver;
 import com.joshcummings.codeplay.terracotta.service.AccountService;
 import com.joshcummings.codeplay.terracotta.service.CheckService;
 import com.joshcummings.codeplay.terracotta.service.EmailService;
@@ -38,6 +39,7 @@ import com.joshcummings.codeplay.terracotta.servlet.RegisterServlet;
 import com.joshcummings.codeplay.terracotta.servlet.SendResponseServlet;
 import com.joshcummings.codeplay.terracotta.servlet.SiteStatisticsServlet;
 import com.joshcummings.codeplay.terracotta.servlet.TransferMoneyServlet;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.boot.web.servlet.ServletRegistrationBean;
 import org.springframework.context.annotation.Bean;
@@ -55,6 +57,12 @@ import java.util.Arrays;
 
 @Configuration
 public class WebConfiguration implements WebMvcConfigurer {
+
+	@Bean
+	public IpAddressResolver ipAddressResolver(@Value("${network.proxied}") boolean proxied) {
+		return new IpAddressResolver(proxied);
+	}
+
 	@Bean
 	public FilterRegistrationBean userFilter(AccountService accountService, UserService userService) {
 		FilterRegistrationBean bean = new FilterRegistrationBean(
@@ -118,8 +126,12 @@ public class WebConfiguration implements WebMvcConfigurer {
 	}
 
 	@Bean
-	public ServletRegistrationBean loginServlet(AccountService accountService, UserService userService)  {
-		return this.servlet(new LoginServlet(accountService, userService), "/login");
+	public ServletRegistrationBean loginServlet(
+			AccountService accountService,
+			UserService userService,
+			IpAddressResolver ipAddressResolver)  {
+
+		return this.servlet(new LoginServlet(accountService, userService, ipAddressResolver), "/login");
 	}
 
 	@Bean

@@ -52,12 +52,14 @@ public class LoginServlet extends HttpServlet {
 
 	private AccountService accountService;
 	private UserService userService;
+	private final IpAddressResolver ipAddressResolver;
 
 	private final LockoutDecisionManager lockoutDecisionManager = new LockoutDecisionManager();
 
-	public LoginServlet(AccountService accountService, UserService userService) {
+	public LoginServlet(AccountService accountService, UserService userService, IpAddressResolver ipAddressResolver) {
 		this.accountService = accountService;
 		this.userService = userService;
+		this.ipAddressResolver = ipAddressResolver;
 	}
 
 	protected void doPost(
@@ -67,19 +69,21 @@ public class LoginServlet extends HttpServlet {
 		String username = request.getParameter("username");
 		String password = request.getParameter("password");
 
-		if ( this.lockoutDecisionManager.tooManyFailedAttempts(username) ) {
+		String ipAddress = ipAddressResolver.ipAddress(request);
+
+		if ( this.lockoutDecisionManager.tooManyFailedAttempts(username, ipAddress) ) {
 			String error = "This account has been temporarily locked";
 			this.error(request, response, error);
 		} else {
 			User user = this.userService.findByUsernameAndPassword(username, password);
 
 			if (user == null) {
-				this.lockoutDecisionManager.failedLogin(username);
+				this.lockoutDecisionManager.failedLogin(username, ipAddress);
 
 				String error = "The username (" + username + ") or password you provided is incorrect.";
 				this.error(request, response, error);
 			} else {
-				this.lockoutDecisionManager.successfulLogin(username);
+				this.lockoutDecisionManager.successfulLogin(username, ipAddress);
 
 				Set<Account> accounts = this.accountService.findByUsername(user.getUsername());
 

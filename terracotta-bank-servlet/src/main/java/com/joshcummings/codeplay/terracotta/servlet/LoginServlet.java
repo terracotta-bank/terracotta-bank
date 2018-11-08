@@ -17,7 +17,9 @@ package com.joshcummings.codeplay.terracotta.servlet;
 
 import com.joshcummings.codeplay.terracotta.model.Account;
 import com.joshcummings.codeplay.terracotta.model.User;
+import com.joshcummings.codeplay.terracotta.network.IpAddressResolver;
 import com.joshcummings.codeplay.terracotta.service.AccountService;
+import com.joshcummings.codeplay.terracotta.service.LockoutDecisionManager;
 import com.joshcummings.codeplay.terracotta.service.UserService;
 
 import javax.servlet.ServletException;
@@ -51,6 +53,8 @@ public class LoginServlet extends HttpServlet {
 	private AccountService accountService;
 	private UserService userService;
 
+	private final LockoutDecisionManager lockoutDecisionManager = new LockoutDecisionManager();
+
 	public LoginServlet(AccountService accountService, UserService userService) {
 		this.accountService = accountService;
 		this.userService = userService;
@@ -63,25 +67,31 @@ public class LoginServlet extends HttpServlet {
 		String username = request.getParameter("username");
 		String password = request.getParameter("password");
 
-		User user = this.userService.findByUsernameAndPassword(username, password);
-
-		if ( user == null )
-		{
-			String error = "The username (" + username + ") or password you provided is incorrect.";
+		if ( this.lockoutDecisionManager.tooManyFailedAttempts(username) ) {
+			String error = "This account has been temporarily locked";
 			this.error(request, response, error);
-		}
-		else
-		{
-			Set<Account> accounts = this.accountService.findByUsername(user.getUsername());
+		} else {
+			User user = this.userService.findByUsernameAndPassword(username, password);
 
-			request.getSession().setAttribute("authenticatedUser", user);
-			request.getSession().setAttribute("authenticatedAccounts", accounts);
-			
-			String relay = request.getParameter("relay");
-			if ( relay == null || relay.isEmpty() ) {
-				response.sendRedirect(request.getContextPath());
+			if (user == null) {
+				this.lockoutDecisionManager.failedLogin(username);
+
+				String error = "The username (" + username + ") or password you provided is incorrect.";
+				this.error(request, response, error);
 			} else {
-				response.sendRedirect(relay);
+				this.lockoutDecisionManager.successfulLogin(username);
+
+				Set<Account> accounts = this.accountService.findByUsername(user.getUsername());
+
+				request.getSession().setAttribute("authenticatedUser", user);
+				request.getSession().setAttribute("authenticatedAccounts", accounts);
+
+				String relay = request.getParameter("relay");
+				if (relay == null || relay.isEmpty()) {
+					response.sendRedirect(request.getContextPath());
+				} else {
+					response.sendRedirect(relay);
+				}
 			}
 		}
 	}

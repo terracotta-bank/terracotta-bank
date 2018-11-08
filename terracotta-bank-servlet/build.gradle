@@ -30,12 +30,51 @@ sourceCompatibility = 1.8
 
 repositories {
 	mavenCentral()
-    mavenLocal()
+}
+
+test {
+	useTestNG()
 }
 
 jmh {
 	includeTests = true
 	duplicateClassesStrategy = 'warn'
+}
+
+project.configurations {
+	vulnerabilityTestCompile {
+		extendsFrom testCompile
+	}
+	vulnerabilityTestRuntime {
+		extendsFrom vulnerabilityTestCompile, testRuntime
+	}
+}
+
+project.sourceSets {
+	vulnerabilityTest {
+		java.srcDir project.file('src/vulnerability-test/java')
+		resources.srcDir project.file('src/vulnerability-test/resources')
+		compileClasspath = project.sourceSets.main.output +
+				project.sourceSets.test.output +
+				project.configurations.vulnerabilityTestCompile
+		runtimeClasspath = output + compileClasspath + project.configurations.vulnerabilityTestRuntime
+	}
+}
+
+Task vulnerabilityTestTask = project.tasks.create("vulnerabilityTest", Test) {
+	useTestNG()
+	group = 'Verification'
+	description = 'Runs vulnerability tests'
+	dependsOn 'jar'
+	testClassesDirs = project.sourceSets.vulnerabilityTest.output.classesDirs
+	classpath = project.sourceSets.vulnerabilityTest.runtimeClasspath
+}
+
+idea {
+	module {
+		testSourceDirs += project.sourceSets.jmh.java.srcDirs
+		testSourceDirs += project.sourceSets.vulnerabilityTest.java.srcDirs
+	}
 }
 
 dependencies {
@@ -68,10 +107,4 @@ dependencies {
 	jmh('org.openjdk.jmh:jmh-core:1.21')
 	jmh('org.openjdk.jmh:jmh-generator-annprocess:1.21')
 	jmh('org.apache.httpcomponents:httpclient:4.5')
-}
-
-idea {
-	module {
-		testSourceDirs += project.sourceSets.jmh.java.srcDirs
-	}
 }

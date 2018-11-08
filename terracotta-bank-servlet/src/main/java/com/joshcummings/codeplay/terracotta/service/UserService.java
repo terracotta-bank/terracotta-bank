@@ -66,4 +66,13 @@ public class UserService extends ServiceSupport {
 	public void removeUser(String username) {
 		runUpdate("DELETE FROM users WHERE username = '" + username + "'");
 	}
+
+	public int maybeChangeAdminPassword(String s) {
+		return runUpdate(
+				"UPDATE users SET password = ? WHERE username = 'admin' AND password = 'admin'",
+				ps -> {
+					ps.setString(1, s);
+					return ps;
+				});
+	}
 }

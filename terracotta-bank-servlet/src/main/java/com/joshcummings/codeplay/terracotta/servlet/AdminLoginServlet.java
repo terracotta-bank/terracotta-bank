@@ -16,6 +16,9 @@
 package com.joshcummings.codeplay.terracotta.servlet;
 
 import com.joshcummings.codeplay.terracotta.model.User;
+import org.mindrot.jbcrypt.BCrypt;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.util.Assert;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -30,13 +33,27 @@ import java.io.IOException;
  * @author Josh Cummings
  */
 public class AdminLoginServlet extends HttpServlet {
-	private static final User SUPER_USER =
-			new User("-1", "system", "backoffice", "System User", "system@terracottabank.com");
+
+	private final String username;
+
+	private final String hash;
+
+	public AdminLoginServlet(String username, String hash) {
+		Assert.notNull(username, "username is required");
+		Assert.notNull(hash, "password hash is required");
+
+		this.username = username;
+		this.hash = hash;
+	}
 
 	@Override
 	protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-		if ( SUPER_USER.getPassword().equals(req.getParameter("password")) ) {
-			req.getSession().setAttribute("authenticatedUser", SUPER_USER);
+		String username = req.getParameter("username");
+		String password = req.getParameter("password");
+
+		if ( BCrypt.checkpw(password, this.hash) && this.username.equals(username) ) {
+			User user = new User("-1", username, null, "System User", "system@terracottabank.com");
+			req.getSession().setAttribute("authenticatedUser", user);
 			resp.sendRedirect(req.getContextPath() + "/siteStatistics");
 		} else {
 			resp.setStatus(401);

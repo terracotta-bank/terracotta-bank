@@ -85,8 +85,11 @@ public class WebConfiguration implements WebMvcConfigurer {
 	}
 
 	@Bean
-	public ServletRegistrationBean adminLoginServlet(AccountService accountService, UserService userService) {
-		return this.servlet(new AdminLoginServlet(), "/adminLogin");
+	public ServletRegistrationBean adminLoginServlet(
+			@Value("${system.username}") String username,
+			@Value("${system.passwordHash}") String hash) {
+
+		return this.servlet(new AdminLoginServlet(username, hash), "/adminLogin");
 	}
 
 	@Bean

@@ -95,7 +95,7 @@ public class RequestLogFilter implements Filter {
 
 	void computeSessionIdForLogs(HttpSession session, Map<String, Object> attributes) {
 		try {
-			MessageDigest md = MessageDigest.getInstance("MD5");
+			MessageDigest md = MessageDigest.getInstance("SHA-1");
 			md.update(session.getId().getBytes(StandardCharsets.UTF_8));
 			String hashed = Hex.encodeHexString(md.digest());
 			attributes.put("sessionId", hashed);

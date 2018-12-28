@@ -15,6 +15,7 @@
  */
 package com.joshcummings.codeplay.terracotta.config;
 
+import com.joshcummings.codeplay.terracotta.app.RequestLogFilter;
 import com.joshcummings.codeplay.terracotta.app.UserFilter;
 import com.joshcummings.codeplay.terracotta.metrics.RequestClassificationFilter;
 import com.joshcummings.codeplay.terracotta.service.AccountService;
@@ -55,8 +56,19 @@ import java.util.Arrays;
 @Configuration
 public class WebConfiguration implements WebMvcConfigurer {
 	@Bean
-	public Filter userFilter(AccountService accountService, UserService userService) {
-		return new UserFilter(accountService, userService);
+	public FilterRegistrationBean userFilter(AccountService accountService, UserService userService) {
+		FilterRegistrationBean bean = new FilterRegistrationBean(
+				new UserFilter(accountService, userService));
+		bean.setOrder(0);
+		return bean;
+	}
+
+	@Bean
+	public FilterRegistrationBean requestFilter() {
+		FilterRegistrationBean bean = new FilterRegistrationBean(
+				new RequestLogFilter());
+		bean.setOrder(1);
+		return bean;
 	}
 
 	@Bean

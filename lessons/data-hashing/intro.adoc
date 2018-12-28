@@ -1,0 +1,14 @@
+Terracotta logs the session id to the logs. This makes it vulnerable
+to session hijacking to anyone with access to the logs. Oftentimes,
+logs are available to every engineer at the company, which turns this
+into a confidentiality risk.
+
+Try using the logs to hijack a user's session. Carefully examine the
+format to determine your course of action.
+
+For information on how to exploit or mitigate this risk, and learn a bit
+about Java's hashing API along the way, check out the following lesson:
+
+```bash
+./checkout-lesson.sh data-hashing
+```

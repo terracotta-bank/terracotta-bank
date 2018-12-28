@@ -24,6 +24,9 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.time.Clock;
 import java.time.Duration;
 import java.time.Instant;
@@ -91,9 +94,13 @@ public class RequestLogFilter implements Filter {
 	}
 
 	void computeSessionIdForLogs(HttpSession session, Map<String, Object> attributes) {
-		String hashed = Base64.getEncoder().encodeToString(
-				session.getId().getBytes());
-		attributes.put("sessionId", hashed);
+		try {
+			MessageDigest md = MessageDigest.getInstance("MD5");
+			md.update(session.getId().getBytes(StandardCharsets.UTF_8));
+			attributes.put("sessionId", md.digest());
+		} catch ( NoSuchAlgorithmException e ){
+			throw new IllegalArgumentException(e);
+		}
 	}
 
 	@Override

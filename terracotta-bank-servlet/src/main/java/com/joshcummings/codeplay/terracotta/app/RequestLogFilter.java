@@ -97,7 +97,8 @@ public class RequestLogFilter implements Filter {
 		try {
 			MessageDigest md = MessageDigest.getInstance("MD5");
 			md.update(session.getId().getBytes(StandardCharsets.UTF_8));
-			attributes.put("sessionId", md.digest());
+			String hashed = Base64.getEncoder().encodeToString(md.digest());
+			attributes.put("sessionId", hashed);
 		} catch ( NoSuchAlgorithmException e ){
 			throw new IllegalArgumentException(e);
 		}

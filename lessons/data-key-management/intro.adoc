@@ -1,0 +1,9 @@
+Key management - the creation, tracking, rotation, and revocation of
+keys - is a critical security need.
+
+For information on how to manage keys in Java check out the following 
+lesson:
+
+```bash
+./checkout-lesson.sh data-key-management
+```

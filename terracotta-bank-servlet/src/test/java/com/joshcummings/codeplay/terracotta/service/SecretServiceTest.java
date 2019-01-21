@@ -2,6 +2,7 @@ package com.joshcummings.codeplay.terracotta.service;
 
 import com.joshcummings.codeplay.terracotta.crypto.KeyFactory;
 import com.joshcummings.codeplay.terracotta.repo.InMemoryKeyRepository;
+import com.joshcummings.codeplay.terracotta.repo.KeyStoreKeyRepository;
 import com.joshcummings.codeplay.terracotta.service.SecretService;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
@@ -18,7 +19,7 @@ public class SecretServiceTest {
 
 	@BeforeMethod
 	public void setUp() {
-		this.secretService = new SecretService(new InMemoryKeyRepository());
+		this.secretService = new SecretService(new KeyStoreKeyRepository());
 	}
 
 	@Test

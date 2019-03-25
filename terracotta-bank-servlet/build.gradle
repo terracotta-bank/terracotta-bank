@@ -15,6 +15,10 @@ buildscript {
 	}
 }
 
+plugins {
+	id 'com.google.cloud.tools.jib' version '1.0.2'
+}
+
 apply plugin: 'java'
 apply plugin: 'eclipse'
 apply plugin: 'idea'
@@ -30,6 +34,13 @@ sourceCompatibility = 1.8
 
 repositories {
 	mavenCentral()
+}
+
+jib {
+	from.image = 'tomcat:8.5-jre8-alpine'
+	to.image = 'terracotta-bank'
+	container.appRoot = '/usr/local/tomcat/webapps/ROOT'
+	container.environment = [JAVA_OPTS : '-Xmx512m -Djdk.xml.entityExpansionLimit=0']
 }
 
 test {

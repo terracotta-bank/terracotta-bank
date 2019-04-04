@@ -47,7 +47,7 @@ public class RegisterServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 
 	private Long nextUserNumber = 5L;
-	private Long nextAccountNumber = 5L;
+	private Long nextAccountNumber = 987654323L;
 
 	private AccountService accountService;
 	private UserService userService;
@@ -78,7 +78,7 @@ public class RegisterServlet extends HttpServlet {
 		}
 
 		User user = new User(String.valueOf(this.nextUserNumber++), username, password, name, email);
-		Account account = new Account(String.valueOf(this.nextAccountNumber++),
+		Account account = new Account(user.getId(),
 								new BigDecimal("25"),
 								this.nextAccountNumber++,
 								user.getId());

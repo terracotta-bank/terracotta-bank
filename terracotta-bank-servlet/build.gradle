@@ -97,10 +97,12 @@ dependencies {
 	//compile('org.springframework.boot:spring-boot-starter-security')
 	compile('org.springframework.boot:spring-boot-starter-web')
 
+	compile('commons-collections:commons-collections:3.2.1')
 	compile('org.hsqldb:hsqldb')
 	compile('javax.mail:mail:1.4')
 	compile('javax.servlet:jstl')
 	compile('org.apache.tomcat.embed:tomcat-embed-jasper')
+	compile('xalan:xalan:2.7.1')
 	compile('ch.qos.logback:logback-classic:1.2.3')
 	compile('ch.qos.logback:logback-core:1.2.3')
 
@@ -119,6 +121,7 @@ dependencies {
 	testCompile('org.seleniumhq.selenium:selenium-firefox-driver:3.14.0')
 	testCompile('org.seleniumhq.selenium:selenium-support:3.14.0')
 	testCompile('org.testng:testng:6.14.3')
+	testCompile('com.squareup.okhttp3:mockwebserver:3.14.0')
 
 	jmh('org.openjdk.jmh:jmh-core:1.21')
 	jmh('org.openjdk.jmh:jmh-generator-annprocess:1.21')

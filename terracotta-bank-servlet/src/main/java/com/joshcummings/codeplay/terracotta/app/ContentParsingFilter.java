@@ -85,8 +85,7 @@ public class ContentParsingFilter implements Filter {
 			Element root = builder.parse(new InputSource(body)).getDocumentElement();
 			return unmarshal(root);
 		} catch ( Exception e ) {
-			e.printStackTrace();
-			return Collections.emptyMap();
+			throw new IllegalArgumentException(e);
 		}
 	}
 
@@ -119,8 +118,7 @@ public class ContentParsingFilter implements Filter {
 			objectMapper.enableDefaultTyping();
 			return objectMapper.readValue(body, HashMap.class);
 		} catch ( Exception e ) {
-			e.printStackTrace();
-			return Collections.emptyMap();
+			throw new IllegalArgumentException(e);
 		}
 	}
 
@@ -130,8 +128,7 @@ public class ContentParsingFilter implements Filter {
 		try (ObjectInputStream body = new ObjectInputStream(request.getInputStream())) {
 			return (Map<String, Object>) body.readObject();
 		} catch (Exception e) {
-			e.printStackTrace();
-			return Collections.emptyMap();
+			throw new IllegalArgumentException(e);
 		}
 	}
 

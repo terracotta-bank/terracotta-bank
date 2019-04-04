@@ -222,7 +222,11 @@ http://www.tooplate.com/view/2080-minimax
 						<form id="transfer" action="#" method="post" role="form">
 							<div class="col-md-12 col-sm-12 messages"></div>
 							<div class="col-md-12 col-sm-12">
-								<input name="fromAccountNumber" type="text" class="form-control" id="fromAccountNumber" placeholder="From Account Number">
+							    <select name="fromAccountNumber" class="form-control" id="fromAccountNumber">
+							    <c:forEach var="account" items="${authenticatedAccounts}">
+							        <option value="${account.number}">${account.number} - $${account.amount}</option>
+							    </c:forEach>
+							    </select>
 						  	</div>
 							<div class="col-md-12 col-sm-12">
 								<input name="toAccountNumber" type="text" class="form-control" id="toAccountNumber" placeholder="To Account Number">

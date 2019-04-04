@@ -208,10 +208,13 @@ var submitContactUs = function(event) {
 
 var submitShowAccounts = function(event) {
 	event.preventDefault();
-	
+
+	var formData = $(this).serialize();
+
 	$.ajax({
 		url : $("body").data("page-context") + "/showAccounts",
-		type : "GET",
+		type : "POST",
+		data : formData,
 		cache : false,
 		success : function ( response ) {
 			$("#results").html(response);

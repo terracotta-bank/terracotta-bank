@@ -110,6 +110,9 @@ http://www.tooplate.com/view/2080-minimax
 							<input type="hidden" name="csrfToken" value="${csrfToken}"/>
 							<div class="col-md-12 col-sm-12 messages"></div>
 							<div class="col-md-12 col-sm-12">
+								<input name="showAccountsSearch" class="form-control">
+							</div>
+							<div class="col-md-12 col-sm-12">
 								<input name="submit" type="submit" class="form-control" value="SHOW">
 							</div>
 						</form>

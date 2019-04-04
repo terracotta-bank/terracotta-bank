@@ -17,12 +17,19 @@ package com.joshcummings.codeplay.terracotta.servlet;
 
 import com.joshcummings.codeplay.terracotta.model.Account;
 import com.joshcummings.codeplay.terracotta.service.AccountService;
+import org.springframework.expression.Expression;
+import org.springframework.expression.spel.standard.SpelExpressionParser;
+import org.springframework.expression.spel.support.StandardEvaluationContext;
+import org.springframework.util.StringUtils;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 /**
@@ -32,6 +39,7 @@ import java.util.Set;
 public class AccountServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 
+	private SpelExpressionParser parser = new SpelExpressionParser();
 	private AccountService accountService;
 
 	public AccountServlet(AccountService accountService) {
@@ -43,6 +51,12 @@ public class AccountServlet extends HttpServlet {
 			response.sendRedirect(request.getContextPath() + "/employee.jsp?relay=" + request.getRequestURL().toString());
 		} else {
 			Set<Account> accounts = this.accountService.findAll();
+			if (StringUtils.hasText(request.getParameter("showAccountsSearch"))) {
+				String filter = request.getParameter("showAccountsSearch");
+				Expression expression = this.parser.parseExpression("#this.?[" + filter + "]");
+				accounts = new LinkedHashSet<>(
+						(List<Account>) expression.getValue(new StandardEvaluationContext(accounts)));
+			}
 			request.setAttribute("accounts", accounts);
 			request.getRequestDispatcher("/WEB-INF/accounts.jsp").forward(request, response);
 		}

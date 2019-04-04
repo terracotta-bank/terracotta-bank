@@ -28,8 +28,10 @@ import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 import java.io.IOException;
 import java.util.Base64;
+import java.util.Optional;
 import java.util.Set;
 
 /**
@@ -59,7 +61,10 @@ public class UserFilter implements Filter {
 			if ( req instanceof HttpServletRequest ) {
 				HttpServletRequest request = (HttpServletRequest) req;
 
-				User user = (User) request.getSession().getAttribute("authenticatedUser");
+				User user = Optional.ofNullable(request.getSession(false))
+						.map(session -> session.getAttribute("authenticatedUser"))
+						.map(User.class::cast)
+						.orElse(null);
 
 				if ( user == null ) {
 					String authorization = request.getHeader("Authorization");

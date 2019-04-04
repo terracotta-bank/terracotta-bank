@@ -52,6 +52,9 @@ public class SiteStatisticsServlet extends HttpServlet {
 		User user = (User)req.getAttribute("authenticatedUser");
 
 		if ( user != null && "system".equals(user.getUsername()) ) {
+			if (req.getParameter("clear") != null) {
+				InMemoryAppender.clear();
+			}
 			int userCount = this.userService.count();
 			int accountCount = this.accountService.count();
 			String logs = InMemoryAppender.take(20).stream()
@@ -65,7 +68,7 @@ public class SiteStatisticsServlet extends HttpServlet {
 					"    <dd>%d</dd>" +
 					"    <dt>Number of accounts:</dt>" +
 					"    <dd>%d</dd>" +
-					"    <dt>Recent Activity:</dt>" +
+					"    <dt>Recent Activity <a href='?clear'>(clear)</a>:</dt>" +
 					"    <dd>%s</dd>" +
 					"</dl>", userCount, accountCount, logs);
 		} else {

@@ -39,4 +39,8 @@ public class InMemoryAppender extends ConsoleAppender<ILoggingEvent> {
 		}
 		return result;
 	}
+
+	public static void clear() {
+		log.clear();
+	}
 }

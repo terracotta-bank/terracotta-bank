@@ -35,6 +35,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
+import java.util.regex.Pattern;
 
 /**
  * This class makes Terracotta Bank vulnerable to Cross-site Scripting
@@ -58,6 +59,8 @@ public class MakeDepositServlet extends HttpServlet {
 	
 	private static final long serialVersionUID = 1L;
 
+	private static final Pattern IS_DOLLAR = Pattern.compile("([0-9]+)*\\.([0-9]{0,2})");
+
 	private static final String CHECK_IMAGE_LOCATION = "images/checks";
 
 	static {
@@ -76,9 +79,16 @@ public class MakeDepositServlet extends HttpServlet {
 
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		List<String> errors = new ArrayList<>();
-		
+
 		Optional<Integer> accountNumber = tryParse(request.getParameter("depositAccountNumber"), Integer::parseInt, errors);
-		Optional<BigDecimal> amount = tryParse(request.getParameter("depositAmount"), BigDecimal::new, errors);
+		Optional<BigDecimal> amount = tryParse(request.getParameter("depositAmount"),
+				param -> {
+					if (IS_DOLLAR.matcher(param).matches()) {
+						return new BigDecimal(param);
+					} else {
+						return null;
+					}
+				}, errors);
 		Optional<String> checkNumber = tryParse(request.getParameter("depositCheckNumber"), String::new, errors);
 
 		Part image = request.getPart("depositCheckImage");

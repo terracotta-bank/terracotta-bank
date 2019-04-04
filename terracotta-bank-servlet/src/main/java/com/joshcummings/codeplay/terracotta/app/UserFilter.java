@@ -76,9 +76,13 @@ public class UserFilter implements Filter {
 
 				if ( user != null ) {
 					User refreshed = this.userService.findByUsername(user.getUsername());
-					Set<Account> accounts = this.accountService.findByUsername(user.getUsername());
-					request.setAttribute("authenticatedUser", refreshed);
-					request.setAttribute("authenticatedAccounts", accounts);
+					if ( refreshed != null ) {
+						Set<Account> accounts = this.accountService.findByUsername(user.getUsername());
+						request.setAttribute("authenticatedUser", refreshed);
+						request.setAttribute("authenticatedAccounts", accounts);
+					} else {
+						request.setAttribute("authenticatedUser", user);
+					}
 				}
 			}
 		} finally {

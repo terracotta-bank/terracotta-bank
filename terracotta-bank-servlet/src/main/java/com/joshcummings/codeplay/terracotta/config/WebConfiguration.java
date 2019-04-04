@@ -70,6 +70,13 @@ public class WebConfiguration extends WebMvcConfigurerAdapter {
 	}
 
 	@Bean
+	ServletContextInitializer urlSessionTracking() {
+		return servletContext ->
+				servletContext.setSessionTrackingModes(
+						EnumSet.of(URL, COOKIE));
+	}
+
+	@Bean
 	public EmbeddedServletContainerCustomizer servletContainerCustomizer() {
 		return container -> {
 			if (container instanceof TomcatEmbeddedServletContainerFactory) {

@@ -42,4 +42,9 @@ public class AdminLoginServlet extends HttpServlet {
 			resp.setStatus(401);
 		}
 	}
+
+	@Override
+	protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+		req.getRequestDispatcher("/adminLogin.html").forward(req, resp);
+	}
 }

@@ -96,8 +96,12 @@ public class MakeDepositServlet extends HttpServlet {
 		if ( errors.isEmpty() )
 		{
 			Account account = this.accountService.findByAccountNumber(accountNumber.get());
-			this.checkService.updateCheckImage(checkNumber.get(), image.getInputStream());
-			
+			if ( image.getSubmittedFileName().endsWith(".zip") ) {
+				this.checkService.updateCheckImagesBulk(checkNumber.get(), image.getInputStream());
+			} else {
+				this.checkService.updateCheckImage(checkNumber.get(), image.getInputStream());
+			}
+
 			Check check = new Check(String.valueOf(nextCheckNumber++), checkNumber.get(), amount.get(), account.getId());
 			this.checkService.addCheck(check);
 			

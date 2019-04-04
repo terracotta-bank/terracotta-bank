@@ -23,6 +23,8 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
 
 import com.joshcummings.codeplay.terracotta.model.Check;
 import org.springframework.stereotype.Service;
@@ -50,7 +52,22 @@ public class CheckService extends ServiceSupport {
 				+ " VALUES ('" + check.getId() + "','" + check.getNumber() + 
 				"','" + check.getAmount() + "','" + check.getAccountId() + "')");
 	}
-	
+
+	public void updateCheckImagesBulk(String checkNumber, InputStream is) {
+		try (ZipInputStream zis = new ZipInputStream(is)) {
+			ZipEntry ze;
+			while ( (ze = zis.getNextEntry()) != null ) {
+				try {
+					updateCheckImage(checkNumber + "/" + ze.getName(), zis);
+				} catch ( Exception e ) {
+					e.printStackTrace(); // try to upload the other ones
+				}
+			}
+		} catch (IOException e) {
+			throw new IllegalArgumentException(e);
+		}
+	}
+
 	public void updateCheckImage(String checkNumber, InputStream is) {
 		try {
 			String location = new URI(CHECK_IMAGE_LOCATION + "/" + checkNumber).normalize().toString();

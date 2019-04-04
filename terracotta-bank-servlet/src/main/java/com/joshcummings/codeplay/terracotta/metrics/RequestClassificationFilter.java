@@ -46,12 +46,12 @@ public class RequestClassificationFilter implements Filter {
 			throws IOException, ServletException {
 
 		String classification = req.getParameter("c");
-		chain.doFilter(req, resp);
-
 		if ( resp instanceof HttpServletResponse ) {
 			HttpServletResponse response = (HttpServletResponse) resp;
-			response.addCookie(new Cookie("X-Terracotta-Classification", classification));
+			response.setHeader("X-Terracotta-Classification", classification);
 		}
+
+		chain.doFilter(req, resp);
 	}
 
 	@Override

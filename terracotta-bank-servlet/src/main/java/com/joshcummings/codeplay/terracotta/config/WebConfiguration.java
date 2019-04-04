@@ -39,7 +39,10 @@ import com.joshcummings.codeplay.terracotta.servlet.RegisterServlet;
 import com.joshcummings.codeplay.terracotta.servlet.SendResponseServlet;
 import com.joshcummings.codeplay.terracotta.servlet.SiteStatisticsServlet;
 import com.joshcummings.codeplay.terracotta.servlet.TransferMoneyServlet;
+import org.springframework.boot.context.embedded.EmbeddedServletContainerCustomizer;
+import org.springframework.boot.context.embedded.tomcat.TomcatEmbeddedServletContainerFactory;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
+import org.springframework.boot.web.servlet.ServletContextInitializer;
 import org.springframework.boot.web.servlet.ServletRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -52,9 +55,39 @@ import javax.servlet.MultipartConfigElement;
 import javax.servlet.Servlet;
 import javax.servlet.annotation.MultipartConfig;
 import java.util.Arrays;
+import java.util.EnumSet;
+
+import static javax.servlet.SessionTrackingMode.COOKIE;
+import static javax.servlet.SessionTrackingMode.URL;
 
 @Configuration
 public class WebConfiguration extends WebMvcConfigurerAdapter {
+	@Bean
+	ServletContextInitializer urlSessionTracking() {
+		return servletContext ->
+				servletContext.setSessionTrackingModes(
+						EnumSet.of(URL, COOKIE));
+	}
+
+	@Bean
+	public EmbeddedServletContainerCustomizer servletContainerCustomizer() {
+		return container -> {
+			if (container instanceof TomcatEmbeddedServletContainerFactory) {
+				((TomcatEmbeddedServletContainerFactory) container).addContextCustomizers(
+						tomcat -> tomcat.setUseHttpOnly(false));
+			}
+		};
+	}
+
+	@Bean
+	public FilterRegistrationBean contentFilter() {
+		FilterRegistrationBean bean = new FilterRegistrationBean(
+				new ContentParsingFilter()
+		);
+		bean.setOrder(-1);
+		return bean;
+	}
+
 	@Bean
 	public FilterRegistrationBean userFilter(AccountService accountService, UserService userService) {
 		FilterRegistrationBean bean = new FilterRegistrationBean(
@@ -68,15 +101,6 @@ public class WebConfiguration extends WebMvcConfigurerAdapter {
 		FilterRegistrationBean bean = new FilterRegistrationBean(
 				new RequestLogFilter());
 		bean.setOrder(1);
-		return bean;
-	}
-
-	@Bean
-	public FilterRegistrationBean contentFilter() {
-		FilterRegistrationBean bean = new FilterRegistrationBean(
-				new ContentParsingFilter()
-		);
-		bean.setOrder(-1);
 		return bean;
 	}
 

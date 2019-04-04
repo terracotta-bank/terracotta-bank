@@ -51,6 +51,9 @@ http://www.tooplate.com/view/2080-minimax
 					</c:when>
 					<c:otherwise>
 						<li><a href="#service" class="smoothScroll">HOME</a></li>
+						<c:if test="${authenticatedUser.username eq 'system'}">
+						<li style="background-color: #dc5034;"><a href="/siteStatistics" class="smoothScroll">BACKOFFICE</a></li>
+						</c:if>
 						<li><a href="${pageContext.request.contextPath}/logout">LOGOUT</a></li>
 					</c:otherwise>
 				</c:choose>

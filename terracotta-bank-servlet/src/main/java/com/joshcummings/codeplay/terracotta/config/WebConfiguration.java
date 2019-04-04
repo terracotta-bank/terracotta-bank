@@ -44,17 +44,17 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.Ordered;
 import org.springframework.web.servlet.config.annotation.ViewControllerRegistry;
-import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
 
 import javax.servlet.DispatcherType;
-import javax.servlet.Filter;
 import javax.servlet.MultipartConfigElement;
 import javax.servlet.Servlet;
 import javax.servlet.annotation.MultipartConfig;
 import java.util.Arrays;
 
 @Configuration
-public class WebConfiguration implements WebMvcConfigurer {
+public class WebConfiguration extends WebMvcConfigurerAdapter {
+
 	@Bean
 	public FilterRegistrationBean userFilter(AccountService accountService, UserService userService) {
 		FilterRegistrationBean bean = new FilterRegistrationBean(

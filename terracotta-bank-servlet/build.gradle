@@ -1,6 +1,6 @@
 buildscript {
 	ext {
-		springBootVersion = '2.0.1.RELEASE'
+		springBootVersion = '1.5.1.RELEASE'
 	}
 	repositories {
 		mavenCentral()
@@ -14,6 +14,7 @@ buildscript {
 		classpath("me.champeau.gradle:jmh-gradle-plugin:0.4.7")
 	}
 }
+
 
 plugins {
 	id 'com.google.cloud.tools.jib' version '1.0.2'
@@ -37,7 +38,7 @@ repositories {
 }
 
 jib {
-	from.image = 'tomcat:8.5-jre8-alpine'
+	from.image = 'tomcat:8.0.53-jre8-alpine'
 	to.image = 'terracotta-bank'
 	container.appRoot = '/usr/local/tomcat/webapps/ROOT'
 	container.environment = [JAVA_OPTS : '-Xmx512m -Djdk.xml.entityExpansionLimit=0']
@@ -51,6 +52,7 @@ jmh {
 	includeTests = true
 	duplicateClassesStrategy = 'warn'
 }
+
 
 project.configurations {
 	vulnerabilityTestCompile {
@@ -88,6 +90,8 @@ idea {
 	}
 }
 
+ext['tomcat.version'] = '8.0.53'
+
 dependencies {
 	compile('org.springframework.boot:spring-boot-starter-data-jpa')
 	//compile('org.springframework.boot:spring-boot-starter-security')
@@ -97,11 +101,9 @@ dependencies {
 	compile('javax.mail:mail:1.4')
 	compile('javax.servlet:jstl')
 	compile('org.apache.tomcat.embed:tomcat-embed-jasper')
+	compile('ch.qos.logback:logback-classic:1.2.3')
+	compile('ch.qos.logback:logback-core:1.2.3')
 
-	compile('javax.xml.bind:jaxb-api')
-	compile('com.sun.xml.bind:jaxb-core:2.3.0.1')
-	compile('com.sun.xml.bind:jaxb-impl:2.3.0.1')
-	
 	testCompile('org.springframework:spring-beans')
 	testCompile('org.springframework:spring-context')
 	testCompile('org.springframework:spring-core')
@@ -112,7 +114,10 @@ dependencies {
 	testCompile('com.github.mike10004:littleproxy:1.1.3socksmod1')
 	testCompile('io.github.bonigarcia:webdrivermanager:2.2.1')
  	testCompile('org.mockito:mockito-core')
-	testCompile('org.seleniumhq.selenium:selenium-java')
+	testCompile('org.seleniumhq.selenium:selenium-api:3.14.0')
+	testCompile('org.seleniumhq.selenium:selenium-java:3.14.0')
+	testCompile('org.seleniumhq.selenium:selenium-firefox-driver:3.14.0')
+	testCompile('org.seleniumhq.selenium:selenium-support:3.14.0')
 	testCompile('org.testng:testng:6.14.3')
 
 	jmh('org.openjdk.jmh:jmh-core:1.21')

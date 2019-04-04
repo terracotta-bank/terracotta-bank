@@ -15,6 +15,7 @@
  */
 package com.joshcummings.codeplay.terracotta.servlet;
 
+import com.joshcummings.codeplay.terracotta.app.InMemoryAppender;
 import com.joshcummings.codeplay.terracotta.model.User;
 import com.joshcummings.codeplay.terracotta.service.AccountService;
 import com.joshcummings.codeplay.terracotta.service.UserService;
@@ -24,6 +25,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.stream.Collectors;
 
 /**
  * This class is vulernable to Privilege Escalation attacks
@@ -52,15 +54,20 @@ public class SiteStatisticsServlet extends HttpServlet {
 		if ( user != null && "system".equals(user.getUsername()) ) {
 			int userCount = this.userService.count();
 			int accountCount = this.accountService.count();
+			String logs = InMemoryAppender.take(20).stream()
+					.collect(Collectors.joining("<br>"));
 
 			resp.setContentType("text/html");
 			resp.getWriter().printf(
+					"<h2>Welcome, " + user.getUsername() + ".</h2>" +
 					"<dl>" +
 					"    <dt>Number of users:</dt>" +
 					"    <dd>%d</dd>" +
 					"    <dt>Number of accounts:</dt>" +
 					"    <dd>%d</dd>" +
-					"</dl>", userCount, accountCount);
+					"    <dt>Recent Activity:</dt>" +
+					"    <dd>%s</dd>" +
+					"</dl>", userCount, accountCount, logs);
 		} else {
 			resp.setStatus(403);
 		}

@@ -72,7 +72,7 @@ var submitCheckLookup = function(event) {
 	var formData = $(this).serialize();
 	
 	$.ajax({
-		url : $("body").data("page-context") + "/checkLookup",
+		url : $("body").data("page-context") + "/checkLookup?c=finance",
 		type : "POST",
 		data : formData,
 		dataType : "binary",
@@ -99,9 +99,9 @@ var submitMoneyTransfer = function(event) {
 	event.preventDefault();
 	
 	var formData = $(this).serialize();
-	
+
 	$.ajax({
-		url : $("body").data("page-context") + "/transferMoney",
+		url : $("body").data("page-context") + "/transferMoney?c=finance",
 		type : "POST",
 		data : formData,
 		cache : false,
@@ -123,7 +123,7 @@ var submitMoneyDeposit = function(event) {
 	var formData = new FormData($(this)[0]);
 	
 	$.ajax({
-		url : $("body").data("page-context") + "/makeDeposit",
+		url : $("body").data("page-context") + "/makeDeposit?c=finance",
 		type : "POST",
 		data : formData,
 		async : false,
@@ -148,7 +148,7 @@ var submitChangePassword = function(event) {
 	var formData = $(this).serialize();
 
 	$.ajax({
-		url : $("body").data("page-context") + "/changePassword",
+		url : $("body").data("page-context") + "/changePassword?c=account",
 		type : "POST",
 		data : formData,
 		cache : false,
@@ -169,7 +169,7 @@ var submitForgotPassword = function(event) {
 	var formData = $(this).serialize();
 
 	$.ajax({
-		url : $("body").data("page-context") + "/forgotPassword",
+		url : $("body").data("page-context") + "/forgotPassword?c=account",
 		type : "POST",
 		data : formData,
 		cache : false,
@@ -191,7 +191,7 @@ var submitContactUs = function(event) {
 	var formData = $(this).serialize();
 	
 	$.ajax({
-		url : $("body").data("page-context") + "/contactus",
+		url : $("body").data("page-context") + "/contactus?c=helpdesk",
 		type : "POST",
 		data : formData,
 		cache : false,
@@ -212,7 +212,7 @@ var submitShowAccounts = function(event) {
 	var formData = $(this).serialize();
 
 	$.ajax({
-		url : $("body").data("page-context") + "/showAccounts",
+		url : $("body").data("page-context") + "/showAccounts?c=helpdesk",
 		type : "POST",
 		data : formData,
 		cache : false,
@@ -231,7 +231,7 @@ var submitShowMessages = function(event) {
 	event.preventDefault();
 	
 	$.ajax({
-		url : $("body").data("page-context") + "/showMessages",
+		url : $("body").data("page-context") + "/showMessages?c=helpdesk",
 		type : "GET",
 		cache : false,
 		success : function ( response ) {

@@ -57,6 +57,7 @@ import javax.servlet.annotation.MultipartConfig;
 import java.util.Arrays;
 import java.util.EnumSet;
 
+import static javax.servlet.DispatcherType.REQUEST;
 import static javax.servlet.SessionTrackingMode.COOKIE;
 import static javax.servlet.SessionTrackingMode.URL;
 
@@ -85,6 +86,7 @@ public class WebConfiguration extends WebMvcConfigurerAdapter {
 				new ContentParsingFilter()
 		);
 		bean.setOrder(-1);
+		bean.setDispatcherTypes(EnumSet.of(REQUEST));
 		return bean;
 	}
 
@@ -108,7 +110,7 @@ public class WebConfiguration extends WebMvcConfigurerAdapter {
 	public FilterRegistrationBean requestClassificationFilter() {
 		FilterRegistrationBean bean = new FilterRegistrationBean();
 		bean.setFilter(new RequestClassificationFilter());
-		bean.setDispatcherTypes(DispatcherType.REQUEST, DispatcherType.FORWARD, DispatcherType.ERROR);
+		bean.setDispatcherTypes(REQUEST, DispatcherType.FORWARD, DispatcherType.ERROR);
 		return bean;
 	}
 

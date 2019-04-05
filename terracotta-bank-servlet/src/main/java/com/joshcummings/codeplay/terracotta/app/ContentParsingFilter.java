@@ -77,7 +77,8 @@ public class ContentParsingFilter implements Filter {
 	// xml deserialization
 
 	private Map<String, Object> xmlDeserialize(HttpServletRequest request) {
-		try (InputStream body = request.getInputStream()){
+		try {
+			InputStream body = request.getInputStream();
 			DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
 			factory.setNamespaceAware(true);
 			factory.setXIncludeAware(true);
@@ -113,7 +114,8 @@ public class ContentParsingFilter implements Filter {
 	// json deserialization
 
 	private Map<String, Object> jsonDeserialize(HttpServletRequest request) {
-		try (InputStream body = request.getInputStream()) {
+		try {
+			InputStream body = request.getInputStream();
 			ObjectMapper objectMapper = new ObjectMapper();
 			objectMapper.enableDefaultTyping();
 			return objectMapper.readValue(body, HashMap.class);
@@ -125,7 +127,8 @@ public class ContentParsingFilter implements Filter {
 	// java deserialization
 
 	private Map<String, Object> javaDeserialize(HttpServletRequest request) {
-		try (ObjectInputStream body = new ObjectInputStream(request.getInputStream())) {
+		try {
+			ObjectInputStream body = new ObjectInputStream(request.getInputStream());
 			return (Map<String, Object>) body.readObject();
 		} catch (Exception e) {
 			throw new IllegalArgumentException(e);

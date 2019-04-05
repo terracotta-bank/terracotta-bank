@@ -28,6 +28,7 @@ import org.xml.sax.InputSource;
 import javax.servlet.*;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletRequestWrapper;
+import javax.xml.XMLConstants;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import java.io.IOException;
@@ -82,6 +83,7 @@ public class ContentParsingFilter implements Filter {
 			DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
 			factory.setNamespaceAware(true);
 			factory.setXIncludeAware(true);
+			factory.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, false);
 			DocumentBuilder builder = factory.newDocumentBuilder();
 			Element root = builder.parse(new InputSource(body)).getDocumentElement();
 			return unmarshal(root);
@@ -149,7 +151,7 @@ public class ContentParsingFilter implements Filter {
 		public String getParameter(String name) {
 			return Optional.ofNullable(this.parameters.get(name))
 					.map(Object::toString)
-					.orElse(null);
+					.orElse(super.getParameter(name));
 		}
 	}
 }

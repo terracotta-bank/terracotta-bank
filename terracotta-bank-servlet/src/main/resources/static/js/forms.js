@@ -97,12 +97,18 @@ var submitCheckLookup = function(event) {
 
 var submitMoneyTransfer = function(event) {
 	event.preventDefault();
-	
-	var formData = $(this).serialize();
+
+	var formData =
+		"<request>" +
+			"<fromAccountNumber>" + this.fromAccountNumber.value + "</fromAccountNumber>" +
+		   	"<toAccountNumber>" + this.toAccountNumber.value + "</toAccountNumber>" +
+			"<transferAmount>" + this.transferAmount.value + "</transferAmount>" +
+		"</request>";
 
 	$.ajax({
 		url : $("body").data("page-context") + "/transferMoney?c=finance",
 		type : "POST",
+		contentType : "application/xml",
 		data : formData,
 		cache : false,
 		success : function ( response ) {

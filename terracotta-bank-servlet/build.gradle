@@ -37,6 +37,10 @@ repositories {
 	mavenCentral()
 }
 
+bootRun {
+	systemProperty "jdk.xml.entityExpansionLimit", "0"
+}
+
 jib {
 	from.image = 'tomcat:8.0.53-jre8-alpine'
 	to.image = 'terracotta-bank'

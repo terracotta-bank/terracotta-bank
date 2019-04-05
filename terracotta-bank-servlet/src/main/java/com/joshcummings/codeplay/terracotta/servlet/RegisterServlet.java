@@ -47,7 +47,7 @@ public class RegisterServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 
 	private Long nextUserNumber = 5L;
-	private Long nextAccountNumber = 987654323L;
+	private Long nextAccountNumber = 987654324L;
 
 	private AccountService accountService;
 	private UserService userService;

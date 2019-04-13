@@ -1,0 +1,98 @@
+30 Web Application Security Vulnerabilities in 30 Minutes
+---
+
+Terracotta Bank is vulnerable to many attack vectors.
+Below is a sequence of attacks that can be levied against Terracotta Bank.
+With some practice, you can perform all of these in order in 30 minutes.
+
+1. Information Disclosure
+The error page is not customized. Placing invalid information into the login page will show this login page, telling you important deployment information.
+
+2. Authentication Bypass
+The login request doesn't validate database results; as such, a carefully crafted username can bypass the authentication mechanism.
+
+3. Blind SQL Injection
+The login page is vulnerable to Blind SQL Injection -- using a tool like sqlmap can reveal important database information
+
+4. Username Enumeration
+The usernames can be enumerated since the Forgot Password form gives a different error message when a known username is entered vs an unknown username.
+
+5. Reflected Cross-site Scripting
+Numerous inputs reflect the user's input back in their response and are vulnerable to cross-site scripting
+
+6. Persistent Cross-site Scripting
+Messages sent via the Contact Us Form are persisted and viewable by customer service reps
+
+7. Default Admin Credentials
+The customer service endpoint uses default admin credentials
+
+8. Session Hijacking
+The session cookie incorrectly leaves the httponly flag off, meaning that it can be retreived via Javascript
+
+9. SpEL Injection + Remote Code Execution
+The Show Accounts endpoint accepts SpEL and neither escapes nor sandboxes it.
+
+10. Forced Browser
+The robots.txt page reveals specific login endpoints
+
+11. Session Fixation
+The application accepts session ids in the URL and does not correctly invalidate that session id upon login. 
+This will enable a malicious user to, for example, share his session id with an honest user and assume the logged in status of the honest user.
+
+12. Broken Access Control
+The application makes authorization decisions based on client-provided information. This can be used to gain access to the backoffice.
+
+13. Log Injection
+The backoffice contains request logs, a user can submit a carefully crafted request to introduce a log that appears legitimate
+
+14. CSRF - GET
+Numerous endpoints in Terracotta expose themselves as both GET and POST, meaning that a malicious user can forge GET requests that make material change to an honest user's account.
+
+15. CSRF - POST
+Numerous endpoints do not protect from a malicious user POSTing on the user's behalf.
+
+16. Insecure Randomness
+Many entity identifiers are not random, meaning that valid identifiers can be guessed or derived.
+
+17. Input Tampering
+When transferring money, the value of the select dropdown can be overridden.
+
+18. Open Redirect
+The application does not validate redirects and a malicious user can supply a specially crafted URL or form POST that will redirect an honest user to a configured location when the honest user logs in.
+
+19. CRLF Injection
+The application interprets specially crafted encoded characters to carriage returns and line feeds, allowing them into response headers.
+
+20. Session Pinning
+The application's vulnerability to Open Redirect and CRLF Injection can be combined into an attack where a malicious user can pin the user to a malicious user's session.
+
+21. Directory Traversal
+The application is vulnerable to directory traversal in the Deposit form.
+
+22. Malicious File Upload
+The application does not check the nature of files uploaded in the Deposit form.
+
+23. Zip Slip
+The application allows for zip files to be uploaded to the Deposit form and does not normalize the paths listed in the zip file.
+
+24. Phishing
+The application's vulnerability to Zip Slip or Malicious File Upload allows a malicious user to replace existing application views, enabling Phishing.
+
+25. XXE - XInclude
+The application uses an XML Parser with XInclude enabled, meaning a malicious user can craft an XML payload that reflects private resources in the response.
+
+26. XXE - Exfiltration
+The application parses DOCTYPE headers provided by a malicious user, enabling data exfiltration
+
+27. XXE - Memory DoS
+The application parses DOCTYPE headers provided by a malicious user, enabling a memory DoS. 
+
+28. ReDoS
+The application uses a poorly-formed regular expression that takes an exponentional amount of CPU to determine invalid strings.
+
+29. Insecure Deserialization - JSON
+The application allows a malicious user to indicate which class to deserialize a JSON payload into, enabling deserialization gadgets.
+
+30. Insecure Deserialization - Java Serialization
+The application allows a malicious user to specify Java serialized payloads, enabling deserialization gadgets.
+

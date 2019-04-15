@@ -45,7 +45,7 @@ jib {
 	from.image = 'tomcat:8.0.53-jre8-alpine'
 	to.image = 'terracotta-bank'
 	container.appRoot = '/usr/local/tomcat/webapps/ROOT'
-	container.environment = [JAVA_OPTS : '-Xmx512m -Djdk.xml.entityExpansionLimit=0']
+	container.environment = [JAVA_OPTS : '-Xmx1G -Djdk.xml.entityExpansionLimit=0']
 }
 
 test {

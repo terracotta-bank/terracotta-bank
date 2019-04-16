@@ -81,6 +81,7 @@ public class ContentParsingFilter implements Filter {
 		try {
 			InputStream body = request.getInputStream();
 			DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+			factory.setFeature("http://apache.org/xml/features/disallow-doctype-decl", true);
 			factory.setNamespaceAware(true);
 			factory.setXIncludeAware(true);
 			factory.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, false);

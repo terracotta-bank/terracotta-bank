@@ -86,11 +86,13 @@ public class ContentParsingFilter implements Filter {
 		try {
 			InputStream body = request.getInputStream();
 			DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+			factory.setFeature("http://xml.org/sax/features/external-general-entities", false);
+			factory.setFeature("http://xml.org/sax/features/external-parameter-entities", false);
+			factory.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd", false);
 			factory.setNamespaceAware(true);
 			factory.setXIncludeAware(true);
 			factory.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, false);
 			DocumentBuilder builder = factory.newDocumentBuilder();
-			builder.setEntityResolver(noop);
 			Element root = builder.parse(new InputSource(body)).getDocumentElement();
 			return unmarshal(root);
 		} catch ( Exception e ) {

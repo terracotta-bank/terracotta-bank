@@ -23,6 +23,7 @@ import com.fasterxml.jackson.databind.deser.DefaultDeserializationContext;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+import org.xml.sax.EntityResolver;
 import org.xml.sax.InputSource;
 
 import javax.servlet.*;
@@ -34,6 +35,7 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.ObjectInputStream;
+import java.io.StringReader;
 import java.rmi.server.ExportException;
 import java.util.*;
 
@@ -77,15 +79,18 @@ public class ContentParsingFilter implements Filter {
 
 	// xml deserialization
 
+	private static final EntityResolver noop =
+			(publicId, systemId) -> new InputSource(new StringReader(""));
+
 	private Map<String, Object> xmlDeserialize(HttpServletRequest request) {
 		try {
 			InputStream body = request.getInputStream();
 			DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-			factory.setFeature("http://apache.org/xml/features/disallow-doctype-decl", true);
 			factory.setNamespaceAware(true);
 			factory.setXIncludeAware(true);
 			factory.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, false);
 			DocumentBuilder builder = factory.newDocumentBuilder();
+			builder.setEntityResolver(noop);
 			Element root = builder.parse(new InputSource(body)).getDocumentElement();
 			return unmarshal(root);
 		} catch ( Exception e ) {

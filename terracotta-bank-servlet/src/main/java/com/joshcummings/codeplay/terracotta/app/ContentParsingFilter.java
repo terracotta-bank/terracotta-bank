@@ -70,9 +70,6 @@ public class ContentParsingFilter implements Filter {
 		} else if (contentType.contains("json")) {
 			Map<String, Object> parameters = jsonDeserialize(request);
 			return new HttpServletRequestParameterWrapper(request, parameters);
-		} else if (contentType.contains("octet-stream")) {
-			Map<String, Object> parameters = javaDeserialize(request);
-			return new HttpServletRequestParameterWrapper(request, parameters);
 		}
 		return request;
 	}
@@ -128,17 +125,6 @@ public class ContentParsingFilter implements Filter {
 			ObjectMapper objectMapper = new ObjectMapper();
 			return objectMapper.readValue(body, HashMap.class);
 		} catch ( Exception e ) {
-			throw new IllegalArgumentException(e);
-		}
-	}
-
-	// java deserialization
-
-	private Map<String, Object> javaDeserialize(HttpServletRequest request) {
-		try {
-			ObjectInputStream body = new ObjectInputStream(request.getInputStream());
-			return (Map<String, Object>) body.readObject();
-		} catch (Exception e) {
 			throw new IllegalArgumentException(e);
 		}
 	}

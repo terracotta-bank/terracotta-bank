@@ -126,7 +126,6 @@ public class ContentParsingFilter implements Filter {
 		try {
 			InputStream body = request.getInputStream();
 			ObjectMapper objectMapper = new ObjectMapper();
-			objectMapper.enableDefaultTyping();
 			return objectMapper.readValue(body, HashMap.class);
 		} catch ( Exception e ) {
 			throw new IllegalArgumentException(e);

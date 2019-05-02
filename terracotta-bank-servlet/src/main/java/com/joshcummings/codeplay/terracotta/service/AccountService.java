@@ -1,5 +1,5 @@
 /*
- * Copyright 2015-2018 Josh Cummings
+ * Copyright 2015-2019 Josh Cummings
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -77,9 +77,17 @@ public class AccountService extends ServiceSupport {
 				+ " VALUES ('" + account.getId() + "','" + account.getAmount() + 
 				"','" + account.getNumber() + "','" + account.getOwnerId() + "')");
 	}
-	
+
 	public Account makeDeposit(Account account, Check check) {
-		runUpdate("UPDATE accounts SET amount = " + account.getAmount().add(check.getAmount()).toString() + " WHERE id = " + account.getId());
+		return makeDeposit(account, check.getAmount());
+	}
+	public Account makeDeposit(Integer accountNumber, BigDecimal amount) {
+		Account account = findByAccountNumber(accountNumber);
+		return makeDeposit(account, amount);
+	}
+
+	public Account makeDeposit(Account account, BigDecimal amount) {
+		runUpdate("UPDATE accounts SET amount = " + account.getAmount().add(amount).toString() + " WHERE id = " + account.getId());
 		return findById(account.getId());
 	}
 	

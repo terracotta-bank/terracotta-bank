@@ -1,5 +1,5 @@
 /*
- * Copyright 2015-2018 Josh Cummings
+ * Copyright 2015-2019 Josh Cummings
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,11 +21,13 @@ import com.joshcummings.codeplay.terracotta.app.UserFilter;
 import com.joshcummings.codeplay.terracotta.metrics.RequestClassificationFilter;
 import com.joshcummings.codeplay.terracotta.service.AccountService;
 import com.joshcummings.codeplay.terracotta.service.CheckService;
+import com.joshcummings.codeplay.terracotta.service.ClientService;
 import com.joshcummings.codeplay.terracotta.service.EmailService;
 import com.joshcummings.codeplay.terracotta.service.MessageService;
 import com.joshcummings.codeplay.terracotta.service.UserService;
 import com.joshcummings.codeplay.terracotta.servlet.AccountServlet;
 import com.joshcummings.codeplay.terracotta.servlet.AdminLoginServlet;
+import com.joshcummings.codeplay.terracotta.servlet.BankTransferServlet;
 import com.joshcummings.codeplay.terracotta.servlet.ChangePasswordServlet;
 import com.joshcummings.codeplay.terracotta.servlet.CheckLookupServlet;
 import com.joshcummings.codeplay.terracotta.servlet.ContactUsServlet;
@@ -122,6 +124,11 @@ public class WebConfiguration extends WebMvcConfigurerAdapter {
 	@Bean
 	public ServletRegistrationBean adminLoginServlet(AccountService accountService, UserService userService) {
 		return this.servlet(new AdminLoginServlet(), "/adminLogin");
+	}
+
+	@Bean
+	public ServletRegistrationBean bankTransferServlet(AccountService accountService, ClientService clientService) {
+		return this.servlet(new BankTransferServlet(accountService, clientService), "/bankTransfer");
 	}
 
 	@Bean

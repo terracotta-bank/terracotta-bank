@@ -19,8 +19,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.joshcummings.codeplay.terracotta.model.Account;
 import com.joshcummings.codeplay.terracotta.model.Client;
 import com.joshcummings.codeplay.terracotta.security.Mac;
+import com.joshcummings.codeplay.terracotta.security.Signature;
 import com.joshcummings.codeplay.terracotta.service.AccountService;
 import com.joshcummings.codeplay.terracotta.service.ClientService;
+import com.nimbusds.jose.Algorithm;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -29,6 +31,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.security.MessageDigest;
+import java.security.PublicKey;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Base64;
@@ -121,7 +124,20 @@ public class BankTransferServlet extends HttpServlet {
 				.map(this.clientService::findByClientId)
 				.orElseThrow(notFound("clientId"));
 
-		return verifyMac(sender, c, request);
+		Client.Algorithm algorithm = Optional.ofNullable(request.getParameter("version"))
+				.map(Client.Algorithm::valueOf).orElseThrow(notFound("version"));
+		if (algorithm != c.getAlgorithm()) {
+			throw new IllegalArgumentException("algorithm mismatch");
+		}
+
+		switch (c.getAlgorithm()) {
+			case v1:
+				return verifyMac(sender, c, request);
+			case v2:
+				return verifySignature(sender, c, request);
+		}
+
+		throw new IllegalArgumentException("Invalid algorithm");
 	}
 
 	private boolean verifyMac(byte[] sender, Client c, HttpServletRequest request) {
@@ -136,5 +152,17 @@ public class BankTransferServlet extends HttpServlet {
 		byte[] recipient = mac.doFinal();
 
 		return MessageDigest.isEqual(sender, recipient);
+	}
+
+	private boolean verifySignature(byte[] sender, Client c, HttpServletRequest request) {
+		Signature signature = Signature.getInstance("SHA256WITHRSA");
+		signature.initVerify((PublicKey) c.getClientSecret());
+		signature.update("v2".getBytes(UTF_8));
+		signature.update(c.getClientId().getBytes(UTF_8));
+		Optional.ofNullable(request.getParameter("accountNumber"))
+				.map(number -> number.getBytes(UTF_8)).ifPresent(signature::update);
+		Optional.ofNullable(request.getParameter("amount"))
+				.map(amount -> amount.getBytes(UTF_8)).ifPresent(signature::update);
+		return signature.verify(sender);
 	}
 }

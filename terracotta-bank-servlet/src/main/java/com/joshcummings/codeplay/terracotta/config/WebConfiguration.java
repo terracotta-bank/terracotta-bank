@@ -84,9 +84,9 @@ public class WebConfiguration extends WebMvcConfigurerAdapter {
 	}
 
 	@Bean
-	public FilterRegistrationBean contentFilter() {
+	public FilterRegistrationBean contentFilter(ClientService clientService) {
 		FilterRegistrationBean bean = new FilterRegistrationBean(
-				new ContentParsingFilter()
+				new ContentParsingFilter(clientService)
 		);
 		bean.setOrder(-1);
 		bean.setDispatcherTypes(EnumSet.of(REQUEST));

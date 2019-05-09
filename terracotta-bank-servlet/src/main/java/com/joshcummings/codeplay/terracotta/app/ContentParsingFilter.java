@@ -15,11 +15,22 @@
  */
 package com.joshcummings.codeplay.terracotta.app;
 
-import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.databind.*;
-import com.fasterxml.jackson.databind.cfg.DeserializerFactoryConfig;
-import com.fasterxml.jackson.databind.deser.BeanDeserializerFactory;
-import com.fasterxml.jackson.databind.deser.DefaultDeserializationContext;
+import com.google.common.cache.Cache;
+import com.google.common.cache.CacheBuilder;
+import com.joshcummings.codeplay.terracotta.model.Client;
+import com.joshcummings.codeplay.terracotta.service.ClientService;
+import com.nimbusds.jwt.JWT;
+import com.nimbusds.jwt.JWTParser;
+import org.springframework.security.oauth2.core.DelegatingOAuth2TokenValidator;
+import org.springframework.security.oauth2.core.OAuth2Error;
+import org.springframework.security.oauth2.core.OAuth2TokenValidator;
+import org.springframework.security.oauth2.core.OAuth2TokenValidatorResult;
+import org.springframework.security.oauth2.jose.jws.JwsAlgorithms;
+import org.springframework.security.oauth2.jwt.Jwt;
+import org.springframework.security.oauth2.jwt.JwtValidators;
+import org.springframework.security.oauth2.jwt.NimbusJwtDecoderJwkSupport;
+import org.springframework.util.StreamUtils;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -28,13 +39,16 @@ import org.xml.sax.InputSource;
 import javax.servlet.*;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletRequestWrapper;
+import javax.servlet.http.HttpServletResponse;
 import javax.xml.XMLConstants;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.ObjectInputStream;
-import java.rmi.server.ExportException;
+import java.nio.charset.StandardCharsets;
+import java.time.Duration;
+import java.time.Instant;
 import java.util.*;
 
 /**
@@ -49,9 +63,15 @@ import java.util.*;
  * @author Josh Cummings
  */
 public class ContentParsingFilter implements Filter {
+	private ClientService clientService;
+
+	public ContentParsingFilter(ClientService clientService) {
+		this.clientService = clientService;
+	}
+
 	@Override
 	public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
-		chain.doFilter(wrapRequest((HttpServletRequest) request), response);
+		chain.doFilter(wrapRequest((HttpServletRequest) request, (HttpServletResponse) response), response);
 	}
 
 	@Override
@@ -60,7 +80,7 @@ public class ContentParsingFilter implements Filter {
 	@Override
 	public void destroy() {}
 
-	private HttpServletRequest wrapRequest(HttpServletRequest request) {
+	private HttpServletRequest wrapRequest(HttpServletRequest request, HttpServletResponse response) {
 		String contentType = Optional.ofNullable(request.getContentType()).orElse("");
 		if (contentType.contains("xml")) {
 			Map<String, Object> parameters = xmlDeserialize(request);
@@ -70,6 +90,9 @@ public class ContentParsingFilter implements Filter {
 			return new HttpServletRequestParameterWrapper(request, parameters);
 		} else if (contentType.contains("octet-stream")) {
 			Map<String, Object> parameters = javaDeserialize(request);
+			return new HttpServletRequestParameterWrapper(request, parameters);
+		} else if (contentType.equals("application/jwt")) {
+			Map<String, Object> parameters = jwtDeserialize(request, response);
 			return new HttpServletRequestParameterWrapper(request, parameters);
 		}
 		return request;
@@ -135,6 +158,51 @@ public class ContentParsingFilter implements Filter {
 		} catch (Exception e) {
 			throw new IllegalArgumentException(e);
 		}
+	}
+
+	// jwt deserialization
+
+	private static Cache<String, String> cache = CacheBuilder.newBuilder()
+			.expireAfterWrite(Duration.ofSeconds(120)).build();
+
+	private Map<String, Object> jwtDeserialize(HttpServletRequest request,
+											   HttpServletResponse response) {
+		try {
+			return jwtDeserialize(request);
+		} catch (Exception e) {
+			response.setStatus(401);
+			return Collections.emptyMap();
+		}
+	}
+
+	private Map<String, Object> jwtDeserialize(HttpServletRequest request) throws Exception {
+		String encodedJwt = StreamUtils.copyToString(request.getInputStream(), StandardCharsets.UTF_8);
+		JWT jwt = JWTParser.parse(encodedJwt);
+		Client client = this.clientService.findByClientId((String) jwt.getJWTClaimsSet().getClaim("clientId"));
+		if (client == null) {
+			throw new IllegalArgumentException("Could not find client");
+		}
+
+		// note that this construction could be done at startup time - inlined for convenience in demoing
+		NimbusJwtDecoderJwkSupport support =
+				new NimbusJwtDecoderJwkSupport(client.getKeySetUri().toString(), JwsAlgorithms.RS256);
+		DelegatingOAuth2TokenValidator<Jwt> jwtValidator =
+				new DelegatingOAuth2TokenValidator<>(JwtValidators.createDefault(),
+						j -> {
+							String jti = j.getId();
+							Instant iat = j.getIssuedAt();
+							Instant now = Instant.now();
+							if (iat == null || iat.isAfter(now) || iat.isBefore(now.minusSeconds(120))) {
+								return OAuth2TokenValidatorResult.failure(new OAuth2Error("invalid_token"));
+							}
+							if (cache.asMap().putIfAbsent(jti, jti) != null) {
+								return OAuth2TokenValidatorResult.failure(new OAuth2Error("invalid_token"));
+							}
+							return OAuth2TokenValidatorResult.success();
+						});
+		support.setJwtValidator(jwtValidator);
+
+		return support.decode(encodedJwt).getClaims();
 	}
 
 	private static class HttpServletRequestParameterWrapper

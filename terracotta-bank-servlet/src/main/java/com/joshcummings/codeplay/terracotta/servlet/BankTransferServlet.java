@@ -74,7 +74,7 @@ public class BankTransferServlet extends HttpServlet {
 			throws ServletException, IOException {
 		List<String> errors = new ArrayList<>();
 
-		if (!verifySignature(request)) {
+		if (!"application/jwt".equals(request.getContentType())) {
 			response.setStatus(401);
 			return;
 		}
@@ -118,85 +118,5 @@ public class BankTransferServlet extends HttpServlet {
 			errors.add(possibleInteger + " is invalid");
 			return Optional.empty();
 		}
-	}
-
-	private static Cache<String, String> cache = CacheBuilder.newBuilder()
-			.expireAfterWrite(Duration.ofSeconds(120)).build();
-
-	private boolean verifyMessage(HttpServletRequest request) {
-		if (verifySignature(request)) {
-			String id = Optional.ofNullable(request.getParameter("id"))
-					.orElseThrow(notFound("id"));
-			Instant created = Optional.ofNullable(request.getParameter("created"))
-					.map(Long::parseLong).map(Instant::ofEpochSecond).orElseThrow(notFound("created"));
-			Instant now = Instant.now();
-			if (created.isAfter(now) || created.isBefore(now.minusSeconds(120))) {
-				throw new IllegalArgumentException("message created outside usable window");
-			}
-			if (cache.asMap().putIfAbsent(id, id) != null) {
-				throw new IllegalArgumentException("duplicate message");
-			}
-			return true;
-		}
-
-		return false;
-	}
-
-	private boolean verifySignature(HttpServletRequest request) {
-		byte[] sender = Optional.ofNullable(request.getParameter("signature"))
-				.map(Base64.getDecoder()::decode).orElseThrow(notFound("signature"));
-
-		Client c = Optional.ofNullable(request.getParameter("clientId"))
-				.map(this.clientService::findByClientId)
-				.orElseThrow(notFound("clientId"));
-
-		Client.Algorithm algorithm = Optional.ofNullable(request.getParameter("version"))
-				.map(Client.Algorithm::valueOf).orElseThrow(notFound("version"));
-		if (algorithm != c.getAlgorithm()) {
-			throw new IllegalArgumentException("algorithm mismatch");
-		}
-
-		switch (c.getAlgorithm()) {
-			case v1:
-				return verifyMac(sender, c, request);
-			case v2:
-				return verifySignature(sender, c, request);
-		}
-
-		throw new IllegalArgumentException("Invalid algorithm");
-	}
-
-	private boolean verifyMac(byte[] sender, Client c, HttpServletRequest request) {
-		Mac mac = Mac.getInstance("HMACSHA256");
-		mac.init(c.getClientSecret());
-		mac.update("v1".getBytes(UTF_8));
-		Optional.ofNullable(request.getParameter("id"))
-				.map(id -> id.getBytes(UTF_8)).ifPresent(mac::update);
-		Optional.ofNullable(request.getParameter("created"))
-				.map(id -> id.getBytes(UTF_8)).ifPresent(mac::update);
-		mac.update(c.getClientId().getBytes(UTF_8));
-		Optional.ofNullable(request.getParameter("accountNumber"))
-				.map(number -> number.getBytes(UTF_8)).ifPresent(mac::update);
-		Optional.ofNullable(request.getParameter("amount"))
-				.map(amount -> amount.getBytes(UTF_8)).ifPresent(mac::update);
-		byte[] recipient = mac.doFinal();
-
-		return MessageDigest.isEqual(sender, recipient);
-	}
-
-	private boolean verifySignature(byte[] sender, Client c, HttpServletRequest request) {
-		Signature signature = Signature.getInstance("SHA256WITHRSA");
-		signature.initVerify((PublicKey) c.getClientSecret());
-		signature.update("v2".getBytes(UTF_8));
-		Optional.ofNullable(request.getParameter("id"))
-				.map(id -> id.getBytes(UTF_8)).ifPresent(signature::update);
-		Optional.ofNullable(request.getParameter("created"))
-				.map(id -> id.getBytes(UTF_8)).ifPresent(signature::update);
-		signature.update(c.getClientId().getBytes(UTF_8));
-		Optional.ofNullable(request.getParameter("accountNumber"))
-				.map(number -> number.getBytes(UTF_8)).ifPresent(signature::update);
-		Optional.ofNullable(request.getParameter("amount"))
-				.map(amount -> amount.getBytes(UTF_8)).ifPresent(signature::update);
-		return signature.verify(sender);
 	}
 }

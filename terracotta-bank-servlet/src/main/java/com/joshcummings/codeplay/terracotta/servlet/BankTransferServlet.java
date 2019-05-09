@@ -28,6 +28,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.security.MessageDigest;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Base64;
@@ -134,6 +135,6 @@ public class BankTransferServlet extends HttpServlet {
 				.map(amount -> amount.getBytes(UTF_8)).ifPresent(mac::update);
 		byte[] recipient = mac.doFinal();
 
-		return Arrays.equals(sender, recipient);
+		return MessageDigest.isEqual(sender, recipient);
 	}
 }

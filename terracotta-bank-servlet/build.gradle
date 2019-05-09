@@ -99,10 +99,12 @@ ext['tomcat.version'] = '8.0.53'
 dependencies {
 	compile('org.springframework.boot:spring-boot-starter-data-jpa')
 	//compile('org.springframework.boot:spring-boot-starter-security')
+	compile('org.springframework.security:spring-security-oauth2-jose:5.1.4.RELEASE')
 	compile('org.springframework.boot:spring-boot-starter-web')
 
 	compile('commons-collections:commons-collections:3.2.1')
 	compile('org.hsqldb:hsqldb')
+	compile('com.google.guava:guava:27.1-jre')
 	compile('javax.mail:mail:1.4')
 	compile('javax.servlet:jstl')
 	compile('org.apache.tomcat.embed:tomcat-embed-jasper')

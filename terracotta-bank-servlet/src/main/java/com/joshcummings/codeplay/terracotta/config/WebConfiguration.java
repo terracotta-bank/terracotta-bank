@@ -16,6 +16,7 @@
 package com.joshcummings.codeplay.terracotta.config;
 
 import com.joshcummings.codeplay.terracotta.app.ContentParsingFilter;
+import com.joshcummings.codeplay.terracotta.app.ExceptionTranslationFilter;
 import com.joshcummings.codeplay.terracotta.app.RequestLogFilter;
 import com.joshcummings.codeplay.terracotta.app.UserFilter;
 import com.joshcummings.codeplay.terracotta.metrics.RequestClassificationFilter;
@@ -105,6 +106,14 @@ public class WebConfiguration extends WebMvcConfigurerAdapter {
 		FilterRegistrationBean bean = new FilterRegistrationBean(
 				new RequestLogFilter());
 		bean.setOrder(1);
+		return bean;
+	}
+
+	@Bean
+	public FilterRegistrationBean exceptionTranslationFilter() {
+		FilterRegistrationBean bean = new FilterRegistrationBean(
+				new ExceptionTranslationFilter());
+		bean.setOrder(Integer.MAX_VALUE);
 		return bean;
 	}
 

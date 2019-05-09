@@ -16,36 +16,23 @@
 package com.joshcummings.codeplay.terracotta.servlet;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.common.cache.Cache;
-import com.google.common.cache.CacheBuilder;
 import com.joshcummings.codeplay.terracotta.model.Account;
 import com.joshcummings.codeplay.terracotta.model.Client;
-import com.joshcummings.codeplay.terracotta.security.Mac;
-import com.joshcummings.codeplay.terracotta.security.Signature;
 import com.joshcummings.codeplay.terracotta.service.AccountService;
 import com.joshcummings.codeplay.terracotta.service.ClientService;
 
-import javax.crypto.SecretKey;
-import javax.crypto.spec.SecretKeySpec;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.math.BigDecimal;
-import java.security.PublicKey;
-import java.time.Duration;
-import java.time.Instant;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Base64;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.regex.Pattern;
-
-import static java.nio.charset.StandardCharsets.UTF_8;
 
 /**
  * This class is vulnerable to Cross-site Scripting and other

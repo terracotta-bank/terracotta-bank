@@ -18,6 +18,7 @@ package com.joshcummings.codeplay.terracotta.servlet;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.joshcummings.codeplay.terracotta.model.Account;
 import com.joshcummings.codeplay.terracotta.model.Client;
+import com.joshcummings.codeplay.terracotta.security.Mac;
 import com.joshcummings.codeplay.terracotta.service.AccountService;
 import com.joshcummings.codeplay.terracotta.service.ClientService;
 
@@ -28,11 +29,15 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Base64;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.regex.Pattern;
+
+import static java.nio.charset.StandardCharsets.UTF_8;
 
 /**
  * This class is vulnerable to Cross-site Scripting and other
@@ -60,6 +65,11 @@ public class BankTransferServlet extends HttpServlet {
 	protected void doPost(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
 		List<String> errors = new ArrayList<>();
+
+		if (!verifySignature(request)) {
+			response.setStatus(401);
+			return;
+		}
 
 		Optional<String> clientId = tryParse(request.getParameter("clientId"), String::valueOf, errors);
 		Optional<Integer> accountNumber = tryParse(request.getParameter("accountNumber"), Integer::parseInt, errors);
@@ -100,5 +110,30 @@ public class BankTransferServlet extends HttpServlet {
 			errors.add(possibleInteger + " is invalid");
 			return Optional.empty();
 		}
+	}
+
+	private boolean verifySignature(HttpServletRequest request) {
+		byte[] sender = Optional.ofNullable(request.getParameter("signature"))
+				.map(Base64.getDecoder()::decode).orElseThrow(notFound("signature"));
+
+		Client c = Optional.ofNullable(request.getParameter("clientId"))
+				.map(this.clientService::findByClientId)
+				.orElseThrow(notFound("clientId"));
+
+		return verifyMac(sender, c, request);
+	}
+
+	private boolean verifyMac(byte[] sender, Client c, HttpServletRequest request) {
+		Mac mac = Mac.getInstance("HMACSHA256");
+		mac.init(c.getClientSecret());
+		mac.update("v1".getBytes(UTF_8));
+		mac.update(c.getClientId().getBytes(UTF_8));
+		Optional.ofNullable(request.getParameter("accountNumber"))
+				.map(number -> number.getBytes(UTF_8)).ifPresent(mac::update);
+		Optional.ofNullable(request.getParameter("amount"))
+				.map(amount -> amount.getBytes(UTF_8)).ifPresent(mac::update);
+		byte[] recipient = mac.doFinal();
+
+		return Arrays.equals(sender, recipient);
 	}
 }

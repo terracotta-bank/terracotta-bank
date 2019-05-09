@@ -16,6 +16,8 @@
 package com.joshcummings.codeplay.terracotta.servlet;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.cache.Cache;
+import com.google.common.cache.CacheBuilder;
 import com.joshcummings.codeplay.terracotta.model.Account;
 import com.joshcummings.codeplay.terracotta.model.Client;
 import com.joshcummings.codeplay.terracotta.security.Mac;
@@ -32,6 +34,8 @@ import java.io.IOException;
 import java.math.BigDecimal;
 import java.security.MessageDigest;
 import java.security.PublicKey;
+import java.time.Duration;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Base64;
@@ -116,6 +120,28 @@ public class BankTransferServlet extends HttpServlet {
 		}
 	}
 
+	private static Cache<String, String> cache = CacheBuilder.newBuilder()
+			.expireAfterWrite(Duration.ofSeconds(120)).build();
+
+	private boolean verifyMessage(HttpServletRequest request) {
+		if (verifySignature(request)) {
+			String id = Optional.ofNullable(request.getParameter("id"))
+					.orElseThrow(notFound("id"));
+			Instant created = Optional.ofNullable(request.getParameter("created"))
+					.map(Long::parseLong).map(Instant::ofEpochSecond).orElseThrow(notFound("created"));
+			Instant now = Instant.now();
+			if (created.isAfter(now) || created.isBefore(now.minusSeconds(120))) {
+				throw new IllegalArgumentException("message created outside usable window");
+			}
+			if (cache.asMap().putIfAbsent(id, id) != null) {
+				throw new IllegalArgumentException("duplicate message");
+			}
+			return true;
+		}
+
+		return false;
+	}
+
 	private boolean verifySignature(HttpServletRequest request) {
 		byte[] sender = Optional.ofNullable(request.getParameter("signature"))
 				.map(Base64.getDecoder()::decode).orElseThrow(notFound("signature"));
@@ -144,6 +170,10 @@ public class BankTransferServlet extends HttpServlet {
 		Mac mac = Mac.getInstance("HMACSHA256");
 		mac.init(c.getClientSecret());
 		mac.update("v1".getBytes(UTF_8));
+		Optional.ofNullable(request.getParameter("id"))
+				.map(id -> id.getBytes(UTF_8)).ifPresent(mac::update);
+		Optional.ofNullable(request.getParameter("created"))
+				.map(id -> id.getBytes(UTF_8)).ifPresent(mac::update);
 		mac.update(c.getClientId().getBytes(UTF_8));
 		Optional.ofNullable(request.getParameter("accountNumber"))
 				.map(number -> number.getBytes(UTF_8)).ifPresent(mac::update);
@@ -158,6 +188,10 @@ public class BankTransferServlet extends HttpServlet {
 		Signature signature = Signature.getInstance("SHA256WITHRSA");
 		signature.initVerify((PublicKey) c.getClientSecret());
 		signature.update("v2".getBytes(UTF_8));
+		Optional.ofNullable(request.getParameter("id"))
+				.map(id -> id.getBytes(UTF_8)).ifPresent(signature::update);
+		Optional.ofNullable(request.getParameter("created"))
+				.map(id -> id.getBytes(UTF_8)).ifPresent(signature::update);
 		signature.update(c.getClientId().getBytes(UTF_8));
 		Optional.ofNullable(request.getParameter("accountNumber"))
 				.map(number -> number.getBytes(UTF_8)).ifPresent(signature::update);

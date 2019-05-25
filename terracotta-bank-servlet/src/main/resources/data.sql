@@ -23,5 +23,5 @@ INSERT INTO accounts (id, amount, number, owner_id) VALUES (4, 12, 987654323, 4)
 
 INSERT INTO messages (id, name, email, subject, message) VALUES (1, '<script>alert("contact name is vulnerable to reflected xss")</script>', '<script>alert("contact email is vulnerable to reflected xss")</script>', '<script>alert("message subject is vulnerable to reflected xss")</script>', '<script>alert("message content is vulnerable to reflected xss")</script>');
 
-INSERT INTO clients (id, client_id, client_secret, algorithm, key_set_uri) VALUES (1, '92938340', 'Y5RIImXaSkusq/4/Z4sKNA==', 'v1', null);
+INSERT INTO clients (id, client_id, client_secret, algorithm, key_set_uri) VALUES (1, '92938340', 'Y5RIImXaSkusq/4/Z4sKNA==', 'v1', 'http://localhost:8081/.well-known/jwks.json');
 INSERT INTO clients (id, client_id, client_secret, algorithm, key_set_uri) VALUES (2, '92938341', 'MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAxBBRT973fjTBtZlv5AQc3pSauRRPmmXnOzlJ5fsUC61W4rzVEMvzXnry2CqLJu5KVUJj8JmkWR2SmeziGPWhes8OW/whNXWdt7KZtELjbN915BFfshsoGyd6skb7uOlNFGOSzE687S/WARyWZYIGuOfEaCGBMuZ/Tmf8BgdF6TTCYCbku3zyMTvxhwFRh/PJ4iJd4AuOJYqUfQ8zNoik3ls96nz5uE4l5taI/bkHhKXkH04RtaD7sAWYELraKYH4lYAbi9HPDxadrG8jgSBMP/9hWdwRq2r8ulyMaLuiJ4VTdm4MMjU4tj7DQcT/txkpqk1EYJKE1H+k66XEy/+hUQIDAQAB', 'v2', 'http://localhost:8081/.well-known/jwks.json');

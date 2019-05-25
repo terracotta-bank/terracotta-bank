@@ -15,9 +15,11 @@
  */
 package com.joshcummings.codeplay.terracotta.app;
 
+import org.apache.commons.codec.binary.Base64InputStream;
 import org.springframework.util.StreamUtils;
 
 import javax.crypto.Cipher;
+import javax.crypto.CipherInputStream;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
 import javax.servlet.Filter;
@@ -86,13 +88,10 @@ public class DecryptionFilter implements Filter {
 	}
 
 	private HttpServletRequest wrap(String version, HttpServletRequest request) throws Exception {
-		String encoded = StreamUtils.copyToString(request.getInputStream(), UTF_8);
-		byte[] ciphertext = Base64.getDecoder().decode(encoded.getBytes(UTF_8));
-		ByteBuffer buffer = ByteBuffer.allocate(ciphertext.length);
-		for (byte b : ciphertext) {
-			buffer.put((byte)(((b + 128) + 13) % 256 - 128));
-		}
-		return new DecryptedWrapper(request, new ByteArrayInputStream(buffer.array()));
+		Cipher cipher = Cipher.getInstance("AES");
+		cipher.init(Cipher.DECRYPT_MODE, secretKey());
+		InputStream plain = new CipherInputStream(new Base64InputStream(request.getInputStream()), cipher);
+		return new DecryptedWrapper(request, plain);
 	}
 
 	@Override

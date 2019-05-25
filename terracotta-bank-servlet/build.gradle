@@ -101,6 +101,7 @@ dependencies {
 	//compile('org.springframework.boot:spring-boot-starter-security')
 	compile('org.springframework.boot:spring-boot-starter-web')
 
+	compile('commons-codec:commons-codec:1.10')
 	compile('commons-collections:commons-collections:3.2.1')
 	compile('org.hsqldb:hsqldb')
 	compile('javax.mail:mail:1.4')

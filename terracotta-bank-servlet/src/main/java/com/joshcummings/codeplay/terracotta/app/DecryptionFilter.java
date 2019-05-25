@@ -21,6 +21,7 @@ import org.springframework.util.StreamUtils;
 import javax.crypto.Cipher;
 import javax.crypto.CipherInputStream;
 import javax.crypto.SecretKey;
+import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
@@ -88,8 +89,10 @@ public class DecryptionFilter implements Filter {
 	}
 
 	private HttpServletRequest wrap(String version, HttpServletRequest request) throws Exception {
-		Cipher cipher = Cipher.getInstance("AES");
-		cipher.init(Cipher.DECRYPT_MODE, secretKey());
+		String ivHeader = request.getHeader("X-Encryption-Iv");
+		byte[] iv = Base64.getDecoder().decode(ivHeader);
+		Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
+		cipher.init(Cipher.DECRYPT_MODE, secretKey(), new IvParameterSpec(iv));
 		InputStream plain = new CipherInputStream(new Base64InputStream(request.getInputStream()), cipher);
 		return new DecryptedWrapper(request, plain);
 	}

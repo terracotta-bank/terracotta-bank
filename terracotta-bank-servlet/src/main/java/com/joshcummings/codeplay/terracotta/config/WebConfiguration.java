@@ -16,6 +16,7 @@
 package com.joshcummings.codeplay.terracotta.config;
 
 import com.joshcummings.codeplay.terracotta.app.ContentParsingFilter;
+import com.joshcummings.codeplay.terracotta.app.DecryptionFilter;
 import com.joshcummings.codeplay.terracotta.app.RequestLogFilter;
 import com.joshcummings.codeplay.terracotta.app.UserFilter;
 import com.joshcummings.codeplay.terracotta.metrics.RequestClassificationFilter;
@@ -53,6 +54,7 @@ import org.springframework.web.servlet.config.annotation.ViewControllerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
 
 import javax.servlet.DispatcherType;
+import javax.servlet.Filter;
 import javax.servlet.MultipartConfigElement;
 import javax.servlet.Servlet;
 import javax.servlet.annotation.MultipartConfig;
@@ -80,6 +82,16 @@ public class WebConfiguration extends WebMvcConfigurerAdapter {
 						tomcat -> tomcat.setUseHttpOnly(false));
 			}
 		};
+	}
+
+	@Bean
+	public FilterRegistrationBean decryptionFilter() {
+		FilterRegistrationBean bean = new FilterRegistrationBean(
+				new DecryptionFilter()
+		);
+		bean.setOrder(-2);
+		bean.setDispatcherTypes(EnumSet.of(REQUEST));
+		return bean;
 	}
 
 	@Bean

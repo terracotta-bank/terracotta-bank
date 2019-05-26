@@ -90,10 +90,18 @@ public class DecryptionFilter implements Filter {
 	}
 
 	private HttpServletRequest wrap(String version, HttpServletRequest request) throws Exception {
+		String encryptedKeyHeader = request.getHeader("X-Encryption-Key");
+		byte[] encryptedKey = Base64.getDecoder().decode(encryptedKeyHeader.getBytes(UTF_8));
+		Cipher keyCipher = Cipher.getInstance("RSA");
+		keyCipher.init(Cipher.DECRYPT_MODE, privateKey());
+		byte[] secretKeyBytes = keyCipher.doFinal(encryptedKey);
+		SecretKey secretKey = new SecretKeySpec(secretKeyBytes, "AES");
+
 		String ivHeader = request.getHeader("X-Encryption-Iv");
 		byte[] iv = Base64.getDecoder().decode(ivHeader);
-		Cipher cipher = Cipher.getInstance("AES/GCM/NoPadding");
-		cipher.init(Cipher.DECRYPT_MODE, secretKey(), new GCMParameterSpec(128, iv));
+		Cipher cipher = Cipher.getInstance("AES/GCM/PKCS5Padding");
+		cipher.init(Cipher.DECRYPT_MODE, secretKey, new GCMParameterSpec(128, iv));
+		cipher.updateAAD(encryptedKey);
 		cipher.updateAAD(version.getBytes(UTF_8));
 		InputStream plain = new CipherInputStream(new Base64InputStream(request.getInputStream()), cipher);
 		return new DecryptedWrapper(request, plain);

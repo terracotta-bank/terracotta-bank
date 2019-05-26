@@ -15,6 +15,7 @@
  */
 package com.joshcummings.codeplay.terracotta;
 
+import com.google.crypto.tink.hybrid.HybridConfig;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.builder.SpringApplicationBuilder;
@@ -31,7 +32,8 @@ public class Mainer extends SpringBootServletInitializer {
 		return builder.sources(Mainer.class);
 	}
 
-	public static void main(String[] args) {
+	public static void main(String[] args) throws Exception {
+		HybridConfig.register();
 		SpringApplication.run(Mainer.class, args);
 	}
 }

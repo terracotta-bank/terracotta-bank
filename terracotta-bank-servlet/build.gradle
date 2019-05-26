@@ -103,6 +103,7 @@ dependencies {
 
 	compile('commons-codec:commons-codec:1.10')
 	compile('commons-collections:commons-collections:3.2.1')
+	compile('com.google.crypto.tink:tink:1.2.2')
 	compile('org.hsqldb:hsqldb')
 	compile('javax.mail:mail:1.4')
 	compile('javax.servlet:jstl')

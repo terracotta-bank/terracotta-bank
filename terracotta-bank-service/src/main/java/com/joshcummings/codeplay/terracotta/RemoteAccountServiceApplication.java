@@ -59,8 +59,8 @@ public class RemoteAccountServiceApplication {
 		sslContext.init(keyManagerFactory.getKeyManagers(), null, null);
 		SSLServerSocket server = (SSLServerSocket)
 				sslContext.getServerSocketFactory().createServerSocket(8443);
-		server.setEnabledProtocols(new String[] { "TLSv1.2" });
-		server.setEnabledCipherSuites(new String[] { "TLS_DHE_RSA_WITH_AES_256_GCM_SHA384" });
+		server.setEnabledProtocols(new String[] { "TLSv1.3" });
+		server.setEnabledCipherSuites(new String[] { "TLS_AES_256_GCM_SHA384" });
 		return server;
 	}
 

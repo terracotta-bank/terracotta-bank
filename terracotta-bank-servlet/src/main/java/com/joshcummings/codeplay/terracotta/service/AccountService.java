@@ -170,8 +170,8 @@ public class AccountService extends ServiceSupport {
 
 		SSLSocket socket =
 				(SSLSocket) sslContext.getSocketFactory().createSocket("localhost", 8443);
-		socket.setEnabledProtocols(new String[] { "TLSv1.2" });
-		socket.setEnabledCipherSuites(new String[] { "TLS_DHE_RSA_WITH_AES_256_GCM_SHA384" });
+		socket.setEnabledProtocols(new String[] { "TLSv1.3" });
+		socket.setEnabledCipherSuites(new String[] { "TLS_AES_256_GCM_SHA384" });
 
 		SSLParameters sslParameters = new SSLParameters();
 		sslParameters.setEndpointIdentificationAlgorithm("HTTPS");

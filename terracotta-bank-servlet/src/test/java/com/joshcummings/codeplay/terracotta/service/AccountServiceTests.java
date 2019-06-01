@@ -44,6 +44,10 @@ public class AccountServiceTests {
 		this.accountService.addAccount(this.account);
 	}
 
+	/**
+	 * NOTE: here in the data-tls branch, this test requires that the remote SSL service,
+	 * terracotta-bank-service, be started up
+	 */
 	@Test
 	public void makeDepositWhenKnownAccountThenPasses() {
 		Account before = this.accountService.findByAccountNumber(this.accountNumber);

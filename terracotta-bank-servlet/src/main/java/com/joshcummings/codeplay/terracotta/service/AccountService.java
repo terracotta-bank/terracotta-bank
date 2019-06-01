@@ -18,6 +18,9 @@ package com.joshcummings.codeplay.terracotta.service;
 import com.joshcummings.codeplay.terracotta.model.Account;
 import com.joshcummings.codeplay.terracotta.model.Check;
 import com.joshcummings.codeplay.terracotta.model.User;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.security.oauth2.client.EnableOAuth2Sso;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Service;
 
@@ -153,23 +156,17 @@ public class AccountService extends ServiceSupport {
 		return readAccount(response);
 	}
 
+	@Value("${keystoreLocation}") String keystoreLocation;
+	@Value("${keystorePassword}") String keystorePassword;
+
 	private SSLSocket sslSocket() throws Exception {
 		SSLContext sslContext = SSLContext.getInstance("TLS");
 
-		TrustManager trustAnything = new X509TrustManager() {
-			@Override
-			public void checkClientTrusted(X509Certificate[] x509Certificates, String s) { }
-
-			@Override
-			public void checkServerTrusted(X509Certificate[] x509Certificates, String s) { }
-
-			@Override
-			public X509Certificate[] getAcceptedIssuers() {
-				return null;
-			}
-		};
-
-		sslContext.init(null, new TrustManager[] { trustAnything }, null);
+		TrustManagerFactory factory = TrustManagerFactory.getInstance(
+				TrustManagerFactory.getDefaultAlgorithm());
+		factory.init(keyStore(this.keystoreLocation, this.keystorePassword.toCharArray()));
+		TrustManager[] trustMyCA = factory.getTrustManagers();
+		sslContext.init(null, trustMyCA, null);
 
 		SSLSocket socket =
 				(SSLSocket) sslContext.getSocketFactory().createSocket("localhost", 8443);

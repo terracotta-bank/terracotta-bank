@@ -154,7 +154,7 @@ public class AccountService extends ServiceSupport {
 	}
 
 	private SSLSocket sslSocket() throws Exception {
-		SSLContext sslContext = SSLContext.getInstance("TLSv1.2");
+		SSLContext sslContext = SSLContext.getInstance("TLS");
 
 		TrustManager trustAnything = new X509TrustManager() {
 			@Override

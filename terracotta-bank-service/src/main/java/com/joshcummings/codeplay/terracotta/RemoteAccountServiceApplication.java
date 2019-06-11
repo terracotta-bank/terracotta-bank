@@ -50,7 +50,7 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 public class RemoteAccountServiceApplication {
 
 	private static SSLServerSocket sslSocket() throws Exception {
-		SSLContext sslContext = SSLContext.getInstance("TLSv1.2");
+		SSLContext sslContext = SSLContext.getInstance("TLS");
 
 		KeyStore keyStore = keyStore();
 		KeyManagerFactory keyManagerFactory =

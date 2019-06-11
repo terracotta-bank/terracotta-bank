@@ -54,7 +54,7 @@ public class RemoteAccountServiceApplication {
 
 		KeyStore keyStore = keyStore();
 		KeyManagerFactory keyManagerFactory =
-				KeyManagerFactory.getInstance(KeyManagerFactory.getDefaultAlgorithm());
+				KeyManagerFactory.getInstance("NewSunX509");
 		keyManagerFactory.init(keyStore, "t3rrac0tta".toCharArray());
 		sslContext.init(keyManagerFactory.getKeyManagers(), null, null);
 		SSLServerSocket server = (SSLServerSocket)

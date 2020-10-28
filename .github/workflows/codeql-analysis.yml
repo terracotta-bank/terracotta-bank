@@ -54,7 +54,7 @@ jobs:
         path: ~/.gradle/caches
         key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle') }}
     - name: Build with Gradle
-      run: cd terracotta-bank-servlet && ./gradlew clean build --continue
+      run: cd terracotta-bank-servlet && ./gradlew clean build -x test --continue
 
     # ℹ️ Command-line programs to run using the OS shell.
     # 📚 https://git.io/JvXDl

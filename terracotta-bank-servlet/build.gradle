@@ -118,12 +118,13 @@ dependencies {
 
 	testCompile('com.github.docker-java:docker-java:3.0.14')
 	testCompile('com.github.mike10004:littleproxy:1.1.3socksmod1')
-	testCompile('io.github.bonigarcia:webdrivermanager:2.2.1')
+	testCompile('io.github.bonigarcia:webdrivermanager:4.2.2')
  	testCompile('org.mockito:mockito-core')
-	testCompile('org.seleniumhq.selenium:selenium-api:3.14.0')
-	testCompile('org.seleniumhq.selenium:selenium-java:3.14.0')
-	testCompile('org.seleniumhq.selenium:selenium-firefox-driver:3.14.0')
-	testCompile('org.seleniumhq.selenium:selenium-support:3.14.0')
+	testCompile('org.seleniumhq.selenium:selenium-api:3.141.59')
+	testCompile('org.seleniumhq.selenium:selenium-java:3.141.59')
+	testCompile('org.seleniumhq.selenium:selenium-firefox-driver:3.141.59')
+	testCompile('org.seleniumhq.selenium:selenium-remote-driver:3.141.59')
+	testCompile('org.seleniumhq.selenium:selenium-support:3.141.59')
 	testCompile('org.testng:testng:6.14.3')
 	testCompile('com.squareup.okhttp3:mockwebserver:3.14.0')
 

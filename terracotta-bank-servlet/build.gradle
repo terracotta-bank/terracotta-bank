@@ -11,7 +11,7 @@ buildscript {
 	}
 	dependencies {
 		classpath("org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}")
-		classpath("me.champeau.gradle:jmh-gradle-plugin:0.4.7")
+		classpath("me.champeau.gradle:jmh-gradle-plugin:0.5.3")
 	}
 }
 

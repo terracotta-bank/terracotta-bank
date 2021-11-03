@@ -103,7 +103,7 @@ dependencies {
 
 	compile('commons-collections:commons-collections:3.2.1')
 	compile('org.hsqldb:hsqldb')
-	compile('javax.mail:mail:1.4')
+	compile('javax.mail:mail:1.4.7')
 	compile('javax.servlet:jstl')
 	compile('org.apache.tomcat.embed:tomcat-embed-jasper')
 	compile('xalan:xalan:2.7.1')
